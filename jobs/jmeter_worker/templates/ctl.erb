@@ -1,0 +1,50 @@
+#!/bin/bash
+
+export PATH=/var/vcap/packages/openjdk/bin:$PATH
+
+JOB_NAME=jmeter_worker
+RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
+LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
+RMI_HOST_DEF=-Djava.rmi.server.hostname=<%=spec.networks.to_h.values.first.ip%>
+PIDFILE=${RUN_DIR}/pid
+
+case $1 in
+
+  start)
+    # Nuke any JAVA process. TODO: use the jmeter builtin script to kill the server
+    # You better not colocated any JAVA app with this job, for now :-)
+    pkill -f java
+
+    mkdir -p $RUN_DIR $LOG_DIR
+    chown -R vcap:vcap $RUN_DIR $LOG_DIR
+
+    echo $$ > $PIDFILE
+
+    pushd /var/vcap/packages/jmeter/bin
+
+    exec ./jmeter ${RMI_HOST_DEF} \
+      -Dserver_port=${SERVER_PORT:-1099} \
+      -s \
+      --jmeterlogfile $LOG_DIR/jmeter-server.log \
+      >>  $LOG_DIR/${JOB_NAME}.stdout.log \
+      2>> $LOG_DIR/${JOB_NAME}.stderr.log
+
+    ;;
+
+  stop)
+    # TODO: use the jmeter builtin script to kill the server
+    # You better not colocated any JAVA app with this job, for now :-)
+    pushd /var/vcap/packages/jmeter/bin
+
+    kill -9 `cat $PIDFILE`
+    rm -f $PIDFILE
+
+    # Nuke Any JAVA process
+    pkill -f java
+
+    ;;
+
+  *)
+    echo "Usage: ctl {start|stop}" ;;
+
+esac

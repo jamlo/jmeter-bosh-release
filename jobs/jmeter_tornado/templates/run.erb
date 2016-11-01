@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Add JAVA to the PATH
+export PATH=/var/vcap/packages/openjdk/bin:$PATH
+
+<%# Collect IP Addresses of all the JMeter Servers %>
+<% jmeter_server_ips = link('jmeter_server').instances.map { |instance| instance.address } %>
+
+# Prepare ENV variables
+ERRAND_NAME=jmeter_tornado
+SERVERS_IP_ADDRESSES=<%=jmeter_server_ips.join(",")%>
+JMX_PLAN=/var/vcap/jobs/${ERRAND_NAME}/bin/test_plan.jmx
+LOG_DIR=/var/vcap/sys/log/${ERRAND_NAME}
+JMETER_LOG_FILE=$LOG_DIR/jmeter.log
+PLAN_EXECUTION_LOG_FILE=$LOG_DIR/log.jtl
+STDOUT_LOG_FILE=$LOG_DIR/${ERRAND_NAME}.stdout.log
+STDERR_LOG_FILE=$LOG_DIR/${ERRAND_NAME}.stderr.log
+
+# Prepare log directory
+mkdir -p $LOG_DIR && chown -R vcap:vcap $LOG_DIR
+
+pushd /var/vcap/packages/jmeter/bin
+
+./jmeter.sh \
+  --nongui \
+  --testfile $JMX_PLAN \
+  --remotestart $SERVERS_IP_ADDRESSES \
+  --jmeterlogfile $JMETER_LOG_FILE \
+  --logfile $PLAN_EXECUTION_LOG_FILE \
+  <% if p('generate_dashboard') %>--reportatendofloadtests --reportoutputfolder $LOG_DIR/dashboard <%end%> >> $STDOUT_LOG_FILE 2>> $STDERR_LOG_FILE

@@ -1,0 +1,15 @@
+---
+name: jmeter_worker
+
+templates:
+  ctl.erb: bin/ctl
+
+packages:
+- jmeter
+- openjdk
+
+provides:
+- name: jmeter_server
+  type: jmeter_server
+
+properties: {}

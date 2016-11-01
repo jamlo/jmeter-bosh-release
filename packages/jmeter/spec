@@ -1,0 +1,8 @@
+---
+name: jmeter
+
+dependencies:
+- openjdk
+
+files:
+- jmeter/apache-jmeter-3.0_1.tgz

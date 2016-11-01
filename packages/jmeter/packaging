@@ -1,0 +1,5 @@
+set -e -x
+
+tar xvf jmeter/apache-jmeter-*.tgz
+
+cp -a apache-jmeter-*/. ${BOSH_INSTALL_TARGET}/

@@ -1,0 +1,6 @@
+set -e -x
+
+mkdir jdk
+tar xvf openjdk/openjdk-*.tar.gz -C jdk
+
+cp -a jdk/. ${BOSH_INSTALL_TARGET}/

@@ -1,0 +1,21 @@
+---
+name: jmeter_tornado
+
+templates:
+  run.erb: bin/run
+  test_plan.jmx.erb: bin/test_plan.jmx
+
+packages:
+- jmeter
+- openjdk
+
+consumes:
+- name: jmeter_server
+  type: jmeter_server
+
+properties:
+  test_plan_xml:
+    description: The JMeter test plan. Generate it using JMeter GUI.
+  generate_dashboard:
+    description: Apply "--reportatendofloadtests" when running jmeter
+    default: false
