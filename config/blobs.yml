@@ -1,6 +1,8 @@
 jmeter/apache-jmeter-3.0_1.tgz:
   size: 45178166
+  object_id: e28d6f50-1c64-41ca-6352-2dcffdbb9894
   sha: 0063516826add27a49eb391e61a6a60dc8065813
 openjdk/openjdk-1.8.0_101-x86_64-trusty.tar.gz:
   size: 77696717
+  object_id: b9565d3c-8899-41ea-440d-2ff2d84269a3
   sha: d77ee059e289ae52fb87812f1a2932268427dc26

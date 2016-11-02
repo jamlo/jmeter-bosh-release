@@ -1,1 +1,7 @@
 final_name: jmeter-tornado
+blobstore:
+  provider: s3
+  options:
+    bucket_name: jmeter-tornado
+    region: us-east-1
+    endpoint: https://s3.amazonaws.com
