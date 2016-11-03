@@ -1,20 +1,23 @@
 #!/bin/bash
-
 export PATH=/var/vcap/packages/openjdk/bin:$PATH
 
 JOB_NAME=jmeter_worker
 RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
 LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
-RMI_HOST_DEF=-Djava.rmi.server.hostname=<%=spec.networks.to_h.values.first.ip%>
 PIDFILE=${RUN_DIR}/pid
 
 # JAVA options
-HEAP="-Xms512m -Xmx512m"
-TENURING="-XX:MaxTenuringThreshold=2"
+XMS="-Xms<%=p('jvm_xms')%>"
+XMX="-Xmx<%=p('jvm_xmx')%>"
+TENURING="-XX:MaxTenuringThreshold=<%=p('jvm_maxTenuringThreshold')%>"
 CLASS_UNLOAD="-XX:+CMSClassUnloadingEnabled"
 DUMP="-XX:+HeapDumpOnOutOfMemoryError"
-SERVER="-server"
-ARGS="$SERVER $DUMP $HEAP $TENURING $CLASS_UNLOAD"
+SERVER="-server" # optimize JAVA performance
+JVM_ARGS="$SERVER $XMS $XMX $TENURING $CLASS_UNLOAD $DUMP"
+
+#JMETER options
+SERVER_PORT=<%=p('server_port')%>
+RMI_HOST_DEF="-Djava.rmi.server.hostname=<%=spec.networks.to_h.values.first.ip%>"
 
 case $1 in
 
@@ -27,10 +30,10 @@ case $1 in
 
     pushd /var/vcap/packages/jmeter/bin
 
-    exec java $ARGS -jar "ApacheJMeter.jar" \
+    exec java $JVM_ARGS -jar "ApacheJMeter.jar" \
       ${RMI_HOST_DEF} \
-      -Dserver_port=${SERVER_PORT:-1099} \
-      -s \
+      -Dserver_port=$SERVER_PORT \
+      --server \
       --jmeterlogfile $LOG_DIR/jmeter-server.log \
       >>  $LOG_DIR/${JOB_NAME}.stdout.log \
       2>> $LOG_DIR/${JOB_NAME}.stderr.log
@@ -39,8 +42,14 @@ case $1 in
 
   stop)
 
-    kill -9 `cat $PIDFILE`
-    rm -f $PIDFILE
+    if [ -f "$PIDFILE" ]; then
+      pid=$(head -n 1 $PIDFILE)
+      kill -9 $pid
+      rm -f $PIDFILE
+      echo "Process $pid killed... well probably"
+    else
+      echo "Unable to find PIDFILE: $PIDFILE"
+    fi
 
     ;;
 
