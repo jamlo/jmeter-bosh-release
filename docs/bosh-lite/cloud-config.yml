@@ -1,0 +1,24 @@
+azs:
+- name: z1
+
+vm_types:
+- name: default
+
+disk_types:
+- name: default
+  disk_size: 1024
+
+compilation:
+  workers: 5
+  az: z1
+  reuse_compilation_vms: true
+  vm_type: default
+  network: default
+
+networks:
+- name: default
+  type: manual
+  subnets:
+    - azs: [z1]
+      range: 10.244.0.0/24
+      reserved: [10.244.0.1]
