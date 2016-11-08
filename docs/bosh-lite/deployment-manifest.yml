@@ -27,7 +27,7 @@ instance_groups:
     jobs:
     - name: jmeter_worker
 
-  - name: tornado
+  - name: storm
     instances: 1
     lifecycle: errand
     vm_type: default
@@ -36,7 +36,7 @@ instance_groups:
     networks:
     - name: default
     jobs:
-    - name: jmeter_tornado
+    - name: jmeter_storm
       properties:
         generate_dashboard: true
         test_plan_xml: |

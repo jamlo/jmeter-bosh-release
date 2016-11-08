@@ -7,7 +7,7 @@ export PATH=/var/vcap/packages/openjdk/bin:$PATH
 <% jmeter_server_ips = link('jmeter_server').instances.map { |instance| instance.address } %>
 
 # Prepare ENV variables
-ERRAND_NAME=jmeter_tornado
+ERRAND_NAME=jmeter_storm
 SERVERS_IP_ADDRESSES=<%=jmeter_server_ips.join(",")%>
 JMX_PLAN=/var/vcap/jobs/${ERRAND_NAME}/bin/test_plan.jmx
 LOG_DIR=/var/vcap/sys/log/${ERRAND_NAME}

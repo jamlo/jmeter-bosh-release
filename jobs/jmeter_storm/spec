@@ -1,5 +1,5 @@
 ---
-name: jmeter_tornado
+name: jmeter_storm
 
 templates:
   run.erb: bin/run
