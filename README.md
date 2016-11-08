@@ -17,4 +17,4 @@ This project, JMeter Tornado, is a [BOSH](https://bosh.io/) release for [Apache 
 
 ## License
 
-Apache License, Version 2.0. See the LICENSE and NOTICE files for more information.
+Apache License, Version 2.0. See the [LICENSE](LICENSE) and [NOTICE](NOTICE) files for more information.
