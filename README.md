@@ -7,8 +7,8 @@ This project, JMeter Tornado, is a [BOSH](https://bosh.io/) release for [Apache 
 ## Features
 
 * Horizontally scale your JMeter load/stress tests with the power of BOSH.
-* Deploy onto multiple IAASes (wherever BOSH can be deployed).
-* Distribute the source traffic of your load tests across multiple regions and IAASes.
+* Deploy onto multiple IaaS offerings (wherever BOSH can be deployed: AWS, Microsoft Azure, Google Compute Engine, OpenStack, etc).
+* Distribute the source traffic of your load tests across multiple regions and IaaS.
 * Tune the JVM options for JMeter from your BOSH deployment manifest (no VM SSHing is needed).
 * The load/stress tests results will be automatically downloaded to your local machine (optional dashboard can be generated).
 * Offered in 2 modes:
