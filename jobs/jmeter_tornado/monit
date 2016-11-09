@@ -1,0 +1,5 @@
+check process jmeter_tornado
+  with pidfile /var/vcap/sys/run/jmeter_tornado/pid
+  start program "/var/vcap/jobs/jmeter_tornado/bin/ctl start"
+  stop program "/var/vcap/jobs/jmeter_tornado/bin/ctl stop"
+  group vcap

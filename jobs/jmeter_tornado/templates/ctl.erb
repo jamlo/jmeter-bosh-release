@@ -1,0 +1,62 @@
+#!/bin/bash
+export PATH=/var/vcap/packages/openjdk/bin:$PATH
+
+JOB_NAME=jmeter_tornado
+RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
+LOGDATE=$(date +%Y-%m-%dT%H-%M-%S-%N)
+LOG_DIR=/var/vcap/sys/log/${JOB_NAME}/log_${LOGDATE}
+PIDFILE=${RUN_DIR}/pid
+
+# JMeter Options
+JMX_PLAN=/var/vcap/jobs/${JOB_NAME}/bin/test_plan.jmx
+PLAN_EXECUTION_LOG_FILE=$LOG_DIR/log.jtl
+JMETER_LOG_FILE=$LOG_DIR/jmeter.log
+STDOUT_LOG_FILE=$LOG_DIR/${JOB_NAME}.stdout.log
+STDERR_LOG_FILE=$LOG_DIR/${JOB_NAME}.stderr.log
+
+# JAVA options
+XMS="-Xms<%=p('jvm_xms')%>"
+XMX="-Xmx<%=p('jvm_xmx')%>"
+TENURING="-XX:MaxTenuringThreshold=<%=p('jvm_maxTenuringThreshold')%>"
+CLASS_UNLOAD="-XX:+CMSClassUnloadingEnabled"
+DUMP="-XX:+HeapDumpOnOutOfMemoryError"
+SERVER="-server" # optimize JAVA performance
+JVM_ARGS="$SERVER $XMS $XMX $TENURING $CLASS_UNLOAD $DUMP"
+
+case $1 in
+
+  start)
+
+    mkdir -p $RUN_DIR $LOG_DIR
+    chown -R vcap:vcap $RUN_DIR $LOG_DIR
+
+    echo $$ > $PIDFILE
+
+    pushd /var/vcap/packages/jmeter/bin
+
+    exec java $JVM_ARGS -jar "ApacheJMeter.jar" \
+      --nongui \
+      --testfile $JMX_PLAN \
+      --logfile $PLAN_EXECUTION_LOG_FILE \
+      --jmeterlogfile $JMETER_LOG_FILE \
+      >>  $STDOUT_LOG_FILE 2>> $STDERR_LOG_FILE
+
+    ;;
+
+  stop)
+
+    if [ -f "$PIDFILE" ]; then
+      pid=$(head -n 1 $PIDFILE)
+      kill -9 $pid
+      rm -f $PIDFILE
+      echo "Process $pid killed... well probably"
+    else
+      echo "Unable to find PIDFILE: $PIDFILE"
+    fi
+
+    ;;
+
+  *)
+    echo "Usage: ctl {start|stop}" ;;
+
+esac
