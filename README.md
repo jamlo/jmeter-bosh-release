@@ -12,8 +12,8 @@ This project, JMeter Tornado, is a [BOSH](https://bosh.io/) release for [Apache 
 * Tune the JVM options for JMeter from your BOSH deployment manifest (no VM SSHing is needed).
 * The load/stress tests results will be automatically downloaded to your local machine (optional dashboard can be generated).
 * Offered in 2 modes:
-  * `Storm` mode: Run your tests and get the results in a tarball downloaded onto your local machine. [Details](#1-storm)
-  * `Tornado` mode: Run your tests to detect the behaviour of your application under heavy traffic. Scale up and down the number of traffic source's VMs on the fly. [Details](#2-tornado)
+  * `Storm` mode: Run your tests and get the results in a tarball downloaded onto your local machine. [Details](#1--storm)
+  * `Tornado` mode: Run your tests to detect the behaviour of your application under heavy traffic. Scale up and down the number of traffic source's VMs on the fly. [Details](#2--tornado)
 
 ## Modes:
 
