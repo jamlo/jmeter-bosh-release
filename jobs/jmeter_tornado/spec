@@ -11,7 +11,11 @@ packages:
 
 properties:
   test_plan_xml:
-    description: The JMeter test plan. Generate it using JMeter GUI.
+    description: The JMeter test plan. Generate it using JMeter GUI. This is the contents of the .jmx file.
+
+  record_result:
+    description: "Set to true if you want to record the execution plan results. Warning: logs can grow in size very quickly, resulting in full disk."
+    default: false
 
   jvm_xms:
     description: Xms value passed

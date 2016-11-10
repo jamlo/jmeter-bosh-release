@@ -3,7 +3,7 @@ export PATH=/var/vcap/packages/openjdk/bin:$PATH
 
 JOB_NAME=jmeter_tornado
 RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
-LOGDATE=$(date +%Y-%m-%dT%H-%M-%S-%N)
+LOGDATE=$(date +%Y-%m-%dT%H-%M-%S)
 LOG_DIR=/var/vcap/sys/log/${JOB_NAME}/log_${LOGDATE}
 PIDFILE=${RUN_DIR}/pid
 
@@ -13,6 +13,7 @@ PLAN_EXECUTION_LOG_FILE=$LOG_DIR/log.jtl
 JMETER_LOG_FILE=$LOG_DIR/jmeter.log
 STDOUT_LOG_FILE=$LOG_DIR/${JOB_NAME}.stdout.log
 STDERR_LOG_FILE=$LOG_DIR/${JOB_NAME}.stderr.log
+GENERATE_LOGS=<% if p('record_result') %>"-l $PLAN_EXECUTION_LOG_FILE"<%end%>
 
 # JAVA options
 XMS="-Xms<%=p('jvm_xms')%>"
@@ -34,12 +35,7 @@ case $1 in
 
     pushd /var/vcap/packages/jmeter/bin
 
-    exec java $JVM_ARGS -jar "ApacheJMeter.jar" \
-      --nongui \
-      --testfile $JMX_PLAN \
-      --logfile $PLAN_EXECUTION_LOG_FILE \
-      --jmeterlogfile $JMETER_LOG_FILE \
-      >>  $STDOUT_LOG_FILE 2>> $STDERR_LOG_FILE
+    exec java $JVM_ARGS -jar "ApacheJMeter.jar" -n -t $JMX_PLAN -j $JMETER_LOG_FILE $GENERATE_LOGS >> $STDOUT_LOG_FILE 2>> $STDERR_LOG_FILE
 
     ;;
 
