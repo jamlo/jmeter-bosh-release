@@ -1,7 +1,5 @@
 # JMeter Tornado (A JMeter BOSH Release)
 
-## About
-
 JMeter Tornado, is a [BOSH](https://bosh.io/) release for [Apache JMeter](http://jmeter.apache.org/). It simplifies the usage of JMeter in distributed mode.
 
 ## Features
@@ -11,29 +9,34 @@ JMeter Tornado, is a [BOSH](https://bosh.io/) release for [Apache JMeter](http:/
 * Distribute the source traffic of your load tests across multiple regions and IaaS.
 * Tune the JVM options for JMeter from your BOSH deployment manifest (no VM SSHing is needed).
 * The load/stress tests results will be automatically downloaded to your local machine (optional dashboard can be generated).
-* Offered in 2 modes:
-  * `Storm` mode: Run your tests and get the results in a tarball downloaded onto your local machine. [Details](#1--storm)
-  * `Tornado` mode: Run your tests to detect the behaviour of your application under continuous heavy traffic. Scale up and down the number of traffic source's VMs on the fly. [Details](#2--tornado)
+* Offered in 2 modes: [`Storm`](#1--storm) and [`Tornado`](#2--tornado) modes.
 
 ## Modes:
 
 ### 1- Storm:
 This mode is used when the collection of the results for JMeter plan execution is necessary. It works by spinning `n` number of VMs that will act as JMeter workers. Those VMs will run JMeter in server mode, and wait for an execution plan to be delivered to them. When all the workers are up, a BOSH errand can be manually triggered where it will send the execution plan to the workers, waits for them to finish execution, collect the results, and download these results to the users local machine.
 
-**Important**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
-
 Two Jobs from the release are used here: `jmeter_worker` and `jmeter_storm` (errand).
+
+>**Important**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
 
 An snippet of a deployment manifest for this mode can be found [here](docs/storm-mode/sample-deployment-manifests-snippets.yml).
 
 ### 2- Tornado:
-This mode is more suitable in the scenario where the simulation of large number of active users is more important than collecting the results logs. An `n` number of VMs will start, each provided the same execution plan, where they will loop indefinitely. Important Note: Your JMeter execution plan should set the `loop indefinitely` flag to true. You can tune the number of working VMs directly through BOSH.
+This mode is more suitable in the scenario where the simulation of large number of active users is more important than collecting the results logs; for example, detecting the behaviour of an application under continuous heavy traffic. An `n` number of VMs will start, each provided the same execution plan, where they will loop indefinitely. Important Note: Your JMeter execution plan should set the `loop indefinitely` flag to true. You can tune the number of working VMs directly through BOSH.
 
 One job from the release is used in this mode: `jmeter_tornado`.
 
 An snippet of a deployment manifest for this mode can be found [here](docs/tornado-mode/sample-deployment-manifests-snippets.yml).
 
-## Guide
+## Getting Started - AWS Example
+
+### Prerequisites
+1. Deploy [BOSH to AWS](http://bosh.io/docs/init-aws.html)
+2. Upload the latest [Ubuntu AWS stemcell](https://bosh.io/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go_agent)
+3. Upload a [Cloud Config](https://bosh.io/docs/cloud-config.html).
+
+### Preparing the Test
 
 1. **Build a Test Plan:** Using JMeter GUI, create a test plan. An example how-to can be found [here](http://jmeter.apache.org/usermanual/build-web-test-plan.html). Save the plan, it should be in a `.jmx` file (xml).
 
