@@ -16,7 +16,7 @@ JMeter Tornado, is a [BOSH](https://bosh.io/) release for [Apache JMeter](http:/
 ### 1- Storm:
 This mode is used when the collection of the results for JMeter plan execution is necessary. It works by spinning `n` number of VMs that will act as JMeter workers. Those VMs will run JMeter in server mode, and wait for an execution plan to be delivered to them. When all the workers are up, a BOSH errand can be manually triggered where it will send the execution plan to the workers, waits for them to finish execution, collect the results, and download these results to the users local machine.
 
-Two Jobs from the release are used here: `jmeter_worker` and `jmeter_storm` (errand).
+Release jobs used in this mode: `jmeter_worker` and `jmeter_storm`.
 
 >**Note**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
 
@@ -25,7 +25,7 @@ An snippet of a deployment manifest for this mode can be found [here](docs/storm
 ### 2- Tornado:
 This mode is more suitable in the scenario where the simulation of large number of active users is more important than collecting the results logs; for example, detecting the behaviour of an application under continuous heavy traffic. An `n` number of VMs will start, each provided the same execution plan, where they will loop indefinitely. You can tune the number of working VMs directly through BOSH.
 
-One job from the release is used in this mode: `jmeter_tornado`.
+Release jobs used in this mode: `jmeter_tornado`.
 
 >**Note**: The JMeter execution plan should set the `loop indefinitely` flag to true.
 
