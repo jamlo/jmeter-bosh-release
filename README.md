@@ -18,14 +18,16 @@ This mode is used when the collection of the results for JMeter plan execution i
 
 Two Jobs from the release are used here: `jmeter_worker` and `jmeter_storm` (errand).
 
->**Important**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
+>**Note**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
 
 An snippet of a deployment manifest for this mode can be found [here](docs/storm-mode/sample-deployment-manifests-snippets.yml).
 
 ### 2- Tornado:
-This mode is more suitable in the scenario where the simulation of large number of active users is more important than collecting the results logs; for example, detecting the behaviour of an application under continuous heavy traffic. An `n` number of VMs will start, each provided the same execution plan, where they will loop indefinitely. Important Note: Your JMeter execution plan should set the `loop indefinitely` flag to true. You can tune the number of working VMs directly through BOSH.
+This mode is more suitable in the scenario where the simulation of large number of active users is more important than collecting the results logs; for example, detecting the behaviour of an application under continuous heavy traffic. An `n` number of VMs will start, each provided the same execution plan, where they will loop indefinitely. You can tune the number of working VMs directly through BOSH.
 
 One job from the release is used in this mode: `jmeter_tornado`.
+
+>**Note**: The JMeter execution plan should set the `loop indefinitely` flag to true.
 
 An snippet of a deployment manifest for this mode can be found [here](docs/tornado-mode/sample-deployment-manifests-snippets.yml).
 
