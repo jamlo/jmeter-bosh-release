@@ -1,0 +1,33 @@
+name: jmeter-tornado
+version: 1.0.0
+commit_hash: 93d0089
+uncommitted_changes: false
+jobs:
+- name: jmeter_storm
+  version: a8ddd70e3c8ad7a1b9891736a711fd3948969824
+  fingerprint: a8ddd70e3c8ad7a1b9891736a711fd3948969824
+  sha1: dffa9c19b74997e3144369aca2dbe1bd5a959c52
+- name: jmeter_tornado
+  version: 220462c455059db479179fc24f85424d5335f18b
+  fingerprint: 220462c455059db479179fc24f85424d5335f18b
+  sha1: a99ce7a53c799f218e98ed9b339261fa069d4ef7
+- name: jmeter_worker
+  version: accf8b331a3cbcd734e4a97a9802748db9fed3aa
+  fingerprint: accf8b331a3cbcd734e4a97a9802748db9fed3aa
+  sha1: 30e8896a8b2b899bad46b9868d0e2b0f901a442c
+packages:
+- name: jmeter
+  version: 2d53b13cebe733e55b66eaaebe1479d924a59977
+  fingerprint: 2d53b13cebe733e55b66eaaebe1479d924a59977
+  sha1: 476dbcba6d33206ffef7320d0221e6e3e8b49f67
+  dependencies:
+  - openjdk
+- name: openjdk
+  version: 51786ba2ad3aff379cf4ee2365045115a0b8daf0
+  fingerprint: 51786ba2ad3aff379cf4ee2365045115a0b8daf0
+  sha1: ff49f2cc1ec2930c68089c5d79d3916e4084d714
+  dependencies: []
+license:
+  version: 2a0f41d526abf842958e4267696d27f28a55a195
+  fingerprint: 2a0f41d526abf842958e4267696d27f28a55a195
+  sha1: 1ad46f1460a59708c2bf9e9cf2cc0110de0fcf9d
