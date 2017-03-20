@@ -1,6 +1,6 @@
-# Tornado for Apache&trade; JMeter&trade; - A BOSH Release for Apache&trade; JMeter&trade;
+# Tornado for Apache JMeter&trade; - A BOSH Release for Apache JMeter&trade;
 
-Tornado for Apache&trade; JMeter&trade;, is a [BOSH](https://bosh.io/) release for [Apache&trade; JMeter&trade;](http://jmeter.apache.org/). It simplifies the usage of JMeter&trade; in distributed mode.
+Tornado for Apache JMeter&trade;, is a [BOSH](https://bosh.io/) release for [Apache JMeter&trade;](http://jmeter.apache.org/). It simplifies the usage of JMeter&trade; in distributed mode.
 
 ## Features
 
