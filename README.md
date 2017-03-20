@@ -1,6 +1,6 @@
-# JMeter Tornado (A JMeter BOSH Release)
+# Tornado for Apache JMeter - (A BOSH Release for Apache JMeter)
 
-JMeter Tornado, is a [BOSH](https://bosh.io/) release for [Apache JMeter](http://jmeter.apache.org/). It simplifies the usage of JMeter in distributed mode.
+Tornado for Apache JMeter, is a [BOSH](https://bosh.io/) release for [Apache JMeter](http://jmeter.apache.org/). It simplifies the usage of JMeter in distributed mode.
 
 ## Features
 
