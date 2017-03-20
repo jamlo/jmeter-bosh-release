@@ -1,24 +1,24 @@
-# Tornado for Apache JMeter - (A BOSH Release for Apache JMeter)
+# Tornado for Apache&trade; JMeter&trade; - (A BOSH Release for Apache&trade; JMeter&trade;)
 
-Tornado for Apache JMeter, is a [BOSH](https://bosh.io/) release for [Apache JMeter](http://jmeter.apache.org/). It simplifies the usage of JMeter in distributed mode.
+Tornado for Apache&trade; JMeter&trade;, is a [BOSH](https://bosh.io/) release for [Apache&trade; JMeter&trade;](http://jmeter.apache.org/). It simplifies the usage of JMeter&trade; in distributed mode.
 
 ## Features
 
-* Horizontally scale your JMeter load/stress tests with the power of BOSH.
+* Horizontally scale your JMeter&trade; load/stress tests with the power of BOSH.
 * Deploy onto multiple IaaS offerings (wherever BOSH can be deployed: AWS, Microsoft Azure, Google Compute Engine, OpenStack, etc).
 * Distribute the source traffic of your load tests across multiple regions and IaaS.
-* Tune the JVM options for JMeter from your BOSH deployment manifest (no VM SSHing is needed).
+* Tune the JVM options for JMeter&trade; from your BOSH deployment manifest (no VM SSHing is needed).
 * The load/stress tests results will be automatically downloaded to your local machine (optional dashboard can be generated).
 * Offered in 2 modes: [`Storm`](#1--storm) and [`Tornado`](#2--tornado) modes.
 
 ## Modes:
 
 ### 1- Storm:
-This mode is used when the collection of the results for JMeter plan execution is necessary. It works by spinning `n` number of VMs that will act as JMeter workers. Those VMs will run JMeter in server mode, and wait for an execution plan to be delivered to them. When all the workers are up, a BOSH errand can be manually triggered where it will send the execution plan to the workers, waits for them to finish execution, collect the results, and download these results to the users local machine.
+This mode is used when the collection of the results for JMeter&trade; plan execution is necessary. It works by spinning `n` number of VMs that will act as JMeter&trade; workers. Those VMs will run JMeter&trade; in server mode, and wait for an execution plan to be delivered to them. When all the workers are up, a BOSH errand can be manually triggered where it will send the execution plan to the workers, waits for them to finish execution, collect the results, and download these results to the users local machine.
 
 Release jobs used in this mode: `jmeter_worker` and `jmeter_storm`.
 
->**Note**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
+>**Note**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter&trade; jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
 
 An snippet of a deployment manifest for this mode can be found [here](docs/storm-mode/sample-deployment-manifests-snippets.yml).
 
@@ -27,7 +27,7 @@ This mode is more suitable in the scenario where the simulation of large number 
 
 Release jobs used in this mode: `jmeter_tornado`.
 
->**Note**: The JMeter execution plan should set the `loop indefinitely` flag to true.
+>**Note**: The JMeter&trade; execution plan should set the `loop indefinitely` flag to true.
 
 An snippet of a deployment manifest for this mode can be found [here](docs/tornado-mode/sample-deployment-manifests-snippets.yml).
 
@@ -49,8 +49,8 @@ An snippet of a deployment manifest for this mode can be found [here](docs/torna
 ## Notes
 
 1. Use a reliable DNS server in your BOSH networks settings; for example Google's `8.8.8.8` DNS server. This will limit the overhead that may occurred during DNS lookup, thus making the test results more realistic.
-2. In an effort to mimic a realistic network traffic source, multiple deployments of JMeter Tornado can be located on multiple IAAS and regions.
+2. In an effort to mimic a realistic network traffic source, multiple deployments of **Tornado for Apache&trade; JMeter&trade;** can be located on multiple IAAS and regions.
 
 ## License
 
-Apache License, Version 2.0. See the [LICENSE](LICENSE) and [NOTICE](NOTICE) files for more information.
+Apache&trade; License, Version 2.0. See the [LICENSE](LICENSE) and [NOTICE](NOTICE) files for more information.
