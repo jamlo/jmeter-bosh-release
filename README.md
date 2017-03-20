@@ -54,3 +54,6 @@ An snippet of a deployment manifest for this mode can be found [here](docs/torna
 ## License
 
 Apache&trade; License, Version 2.0. See the [LICENSE](LICENSE) and [NOTICE](NOTICE) files for more information.
+
+## Foot Notes:
+Apache, Apache JMeter, and JMeter are trademarks of the Apache Software Foundation(ASF)
