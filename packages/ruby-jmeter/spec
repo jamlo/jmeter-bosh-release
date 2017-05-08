@@ -1,0 +1,9 @@
+---
+name: ruby-jmeter
+
+dependencies: []
+
+files:
+- ruby/ruby-2.3.3.tar.gz # https://cache.ruby-lang.org/pub/ruby/2.3/ruby-2.3.3.tar.gz
+- ruby/rubygems-2.6.8.tgz # http://production.cf.rubygems.org/rubygems/rubygems-2.6.8.tgz
+- ruby-jmeter/*.gem

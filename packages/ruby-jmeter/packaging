@@ -1,0 +1,39 @@
+set -e
+
+RUBY_VERSION=2.3.3
+RUBYGEMS_VERSION=2.6.8
+RUBYJMETER_VERSION=3.0.13
+
+tar xzf "ruby/ruby-${RUBY_VERSION}.tar.gz"
+(
+  set -e
+  cd "ruby-${RUBY_VERSION}"
+
+  LDFLAGS="-Wl,-rpath -Wl,${BOSH_INSTALL_TARGET}" CFLAGS='-fPIC' ./configure --prefix=${BOSH_INSTALL_TARGET} --disable-install-doc --with-opt-dir=${BOSH_INSTALL_TARGET} --without-gmp
+  make
+  make install
+)
+
+tar zxvf "ruby/rubygems-${RUBYGEMS_VERSION}.tgz"
+(
+  set -e
+  cd "rubygems-${RUBYGEMS_VERSION}"
+
+  ${BOSH_INSTALL_TARGET}/bin/ruby setup.rb --no-ri --no-rdoc
+
+  if [[ $? != 0 ]] ; then
+    echo "Cannot install rubygems"
+    exit 1
+  fi
+)
+
+(
+  set -e
+  cd "ruby-jmeter"
+  ${BOSH_INSTALL_TARGET}/bin/gem install *.gem --local --no-ri --no-rdoc
+
+  if [[ $? != 0 ]] ; then
+    echo "Cannot install ruby-jmeter gem or its dependencies"
+    exit 1
+  fi
+)

@@ -14,3 +14,15 @@ instance_groups:
       properties:
         test_plan_xml: |
           {Your JMX Plan here}
+        targets:
+        - name: test
+          url: vroom
+          http_method: GET
+          options:
+            request_body: {}
+          headers:
+          - name: jj
+            value: sdfsdf
+        configuration:
+          users: 10
+          rampup: 20

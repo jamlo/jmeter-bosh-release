@@ -1,0 +1,52 @@
+<%=
+
+def validate_http_method(method)
+ supported_methods = ['GET', 'PUT', 'POST', 'DELETE']
+ unless supported_methods.include? method.upcase
+   raise "Supported HTTP Methods: GET, PUT, POST, DELETE. Given method: '#{method}'"
+ end
+end
+
+params = {}
+
+if_p('wizard.targets') do |targets|
+  params['targets'] = []
+
+  if targets.count == 0
+   raise "At least one target should be specified"
+  end
+
+  targets.each do |target|
+    http_method = target.fetch("http_method")
+    validate_http_method(http_method)
+
+    current_target = {
+      "name" => target.fetch("name"),
+      "url" => target.fetch("url"),
+      "http_method" => http_method,
+      "with_xhr" => target.fetch("with_xhr", false),
+      "headers" => [],
+      "options" => target.fetch("options", {})
+    }
+
+    target.fetch("headers", []).each do |header|
+      current_header = {
+        "name" => header.fetch("name"),
+        "value" => header.fetch("value")
+      }
+      current_target['headers'] << current_header
+    end
+
+    params['targets'] << current_target
+  end
+
+  params["configuration"] = {}
+  params["configuration"]["users"] = p("wizard.configuration.users")
+  params["configuration"]["ramp_time"] = p("wizard.configuration.ramp_time")
+  params["configuration"]["continue_forever"] = true # hardcode to true, Tornado mode should loop forever
+  params["configuration"]["duration"] = 60 * 60 * 24 * 365 # hardcode to 1 year, Tornado mode should not stop
+end
+
+JSON.dump(params)
+
+%>
