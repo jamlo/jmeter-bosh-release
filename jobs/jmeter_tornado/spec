@@ -14,15 +14,40 @@ packages:
 - jmeter-dsl
 
 properties:
-  # ==============================================
+  # ==================================================================================================
+  # ==================================================================================================
   # Raw JMX Test Plan Options
   raw_jmx_plan:
-    description: "The JMeter test plan. Generate it using JMeter GUI. This is the contents of the .jmx file."
+    description: |
+      The JMeter test plan. Generate it using JMeter GUI. This is the contents of the .jmx file.
+      Either specify this field or use the wizard option.
 
-  # ==============================================
+  # ==================================================================================================
+  # ==================================================================================================
   # Wizard Options
   wizard.targets:
-    description: "fix me"
+    description: List of targets to hits
+    help: |
+      A target has the following fields:
+        - name: { Unique name of the target}
+          url: { URL to hit }
+          http_method: {HTTP Method. Supportted methods: GET|DELETE|POST|PUT }
+          headers: { A list of HTTP headers. Each with a name and value }
+          - name: { header name }
+            value: { header value }
+          options: { Other options. Only supported option is 'request_body' for PUT and POST }
+            request_body: String
+
+      An example target:
+        - name: Example 1
+          url: "https://192.168.50.1:15672/greeting/post/smurf"
+          http_method: POST
+          headers:
+          - name: "Authorization"
+            value: "Basic Y2F0Om1lb3c="
+          options:
+            request_body: |
+              {"name" : "i am a post", "age" : 425}
 
   wizard.configuration.users:
     description: Number of threads JMeter will use to execute your test, per job instance.
@@ -33,8 +58,8 @@ properties:
         threads. Multiple threads are used to simulate concurrent connections to your server application.""
 
   wizard.configuration.ramp_time:
-    description:
-    help:
+    description: Test ramp up time
+    help: |
       Taken From JMeter Documention
         "The ramp-up period tells JMeter how long to take to "ramp-up" to the full number of threads
         chosen. If 10 threads are used, and the ramp-up period is 100 seconds, then JMeter will take
@@ -49,8 +74,8 @@ properties:
         Start with Ramp-up = number of threads and adjust up or down as needed."
 
 
-
-  # ==============================================
+  # ==================================================================================================
+  # ==================================================================================================
   # JVM Options
   jvm.xms:
     description: "Xms value passed"
@@ -124,7 +149,8 @@ properties:
       # shorter than the period between two scavenges):
       # TENURING="-XX:MaxTenuringThreshold=2"
 
-  # ==============================================
+  # ==================================================================================================
+  # ==================================================================================================
   # Misc
   record_result:
     description: "Not recommended. Set to true if you want to record the execution plan results. Warning: logs can grow in size very quickly, resulting in full disk."
