@@ -1,13 +1,14 @@
 - type: replace
-  path: /instance_groups/name=jmeter_workers/jobs/-
+  path: /instance_groups/name=test_node/jobs/-
   value:
-    name: jmeter_tornado
+    name: jmeter_storm
     release: jmeter-tornado
     properties:
       wizard:
         configuration:
           users: 1
           ramp_time: 1
+          duration: 5
         targets:
         - name: Simple DELETE
           url: "http://192.168.50.1:15672/greeting/delete/smurf"

@@ -1,17 +1,18 @@
 - type: replace
-  path: /instance_groups/name=jmeter_workers/jobs/-
+  path: /instance_groups/name=test_node/jobs/-
   value:
-    name: jmeter_tornado
+    name: jmeter_storm
     release: jmeter-tornado
     properties:
       wizard:
         configuration:
           users: 1
           ramp_time: 1
+          duration: 5
         targets:
-        - name: GET with Headers
-          url: "http://192.168.50.1:15672/greeting/get/protected"
-          http_method: GET
+        - name: Simple DELETE - Headers
+          url: "http://192.168.50.1:15672/greeting/delete/protected"
+          http_method: DELETE
           headers:
           - name: "Authorization"
             value: "Basic Y2F0Om1lb3c=" # cat:meow

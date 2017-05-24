@@ -4,7 +4,7 @@
 # this mode because the errand will never stop running.
 
 instance_groups:
-  - name: jmeter_workers
+  - name: workers
     instances: 3
     vm_type: default
     stemcell: default_stemcell
@@ -12,7 +12,7 @@ instance_groups:
     networks:
     - name: default
     jobs:
-    - name: jmeter_worker
+    - name: jmeter_storm_worker
 
   - name: storm
     instances: 1

@@ -1,5 +1,5 @@
 - type: replace
-  path: /instance_groups/name=jmeter_workers/jobs/-
+  path: /instance_groups/name=test_node/jobs/-
   value:
     name: jmeter_tornado
     release: jmeter-tornado
@@ -9,12 +9,12 @@
           users: 1
           ramp_time: 1
         targets:
-        - name: POST with Headers and Body
-          url: "http://192.168.50.1:15672/greeting/post/smurf"
-          http_method: POST
+        - name: PUT with Headers expected to fail
+          url: "http://192.168.50.1:15672/greeting/put/smurf"
+          http_method: PUT
           headers:
           - name: "Authorization"
-            value: "Basic willnevermatch"
+            value: "Basic willfail"
           options:
             request_body: |
-             {"name" : "i am a post", "age" : 425}
+             {"name" : "i am a put", "age" : 525}

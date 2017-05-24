@@ -1,30 +1,54 @@
 #!/bin/bash
+set -e
 
-# Add JAVA to the PATH
 export PATH=/var/vcap/packages/openjdk/bin:$PATH
+export PATH=/var/vcap/packages/ruby-jmeter/bin:$PATH
+
+JOB_NAME=jmeter_storm
+RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
+LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
+PIDFILE=${RUN_DIR}/pid
+JMX_PLAN_FILE=${RUN_DIR}/plan.jmx
 
 <%# Collect IP Addresses of all the JMeter Servers %>
 <% jmeter_server_ips = link('jmeter_server').instances.map { |instance| instance.address } %>
 
-# Prepare ENV variables
-ERRAND_NAME=jmeter_storm
+# JMeter Options
 SERVERS_IP_ADDRESSES=<%=jmeter_server_ips.join(",")%>
-JMX_PLAN=/var/vcap/jobs/${ERRAND_NAME}/bin/test_plan.jmx
-LOG_DIR=/var/vcap/sys/log/${ERRAND_NAME}
+PLAN_EXECUTION_RESULT_FILE=$LOG_DIR/log.jtl
 JMETER_LOG_FILE=$LOG_DIR/jmeter.log
-PLAN_EXECUTION_LOG_FILE=$LOG_DIR/log.jtl
-STDOUT_LOG_FILE=$LOG_DIR/${ERRAND_NAME}.stdout.log
-STDERR_LOG_FILE=$LOG_DIR/${ERRAND_NAME}.stderr.log
+STDOUT_LOG_FILE=$LOG_DIR/${JOB_NAME}.stdout.log
+STDERR_LOG_FILE=$LOG_DIR/${JOB_NAME}.stderr.log
+GENERATE_DASHBOARD=<% if p('generate_dashboard') %>"--reportatendofloadtests --reportoutputfolder $LOG_DIR/dashboard"<%end%>
 
-# Prepare log directory
-mkdir -p $LOG_DIR && chown -R vcap:vcap $LOG_DIR
+# JAVA options
+SERVER="-server" # optimize JAVA performance
+XMS="-Xms<%=p('jvm.xms')%>"
+XMX="-Xmx<%=p('jvm.xmx')%>"
+TENURING="-XX:MaxTenuringThreshold=<%=p('jvm.maxTenuringThreshold')%>"
+CLASS_UNLOAD="-XX:+CMSClassUnloadingEnabled"
+DUMP="-XX:+HeapDumpOnOutOfMemoryError"
+JVM_ARGS="$SERVER $XMS $XMX $TENURING $CLASS_UNLOAD $DUMP"
+
+mkdir -p $RUN_DIR $LOG_DIR
+chown -R vcap:vcap $RUN_DIR $LOG_DIR
+
+<%if_p('raw_jmx_plan') do%>
+cp /var/vcap/jobs/${JOB_NAME}/config/raw_test_plan.jmx $JMX_PLAN_FILE
+<%end.else do%>
+ruby /var/vcap/packages/jmeter-dsl/jmx_plan_generator.rb \
+     "/var/vcap/jobs/${JOB_NAME}/config/settings.json" \
+     "$JMX_PLAN_FILE" \
+     >> $STDOUT_LOG_FILE \
+     2>> $STDERR_LOG_FILE
+<%end%>
 
 pushd /var/vcap/packages/jmeter/bin
 
-./jmeter.sh \
-  --nongui \
-  --testfile $JMX_PLAN \
-  --remotestart $SERVERS_IP_ADDRESSES \
-  --jmeterlogfile $JMETER_LOG_FILE \
-  --logfile $PLAN_EXECUTION_LOG_FILE \
-  <% if p('generate_dashboard') %>--reportatendofloadtests --reportoutputfolder $LOG_DIR/dashboard <%end%> >> $STDOUT_LOG_FILE 2>> $STDERR_LOG_FILE
+java $JVM_ARGS -jar "ApacheJMeter.jar" \
+    --nongui \
+    --testfile $JMX_PLAN_FILE \
+    --remotestart $SERVERS_IP_ADDRESSES \
+    --jmeterlogfile $JMETER_LOG_FILE \
+    --logfile $PLAN_EXECUTION_RESULT_FILE \
+    $GENERATE_DASHBOARD >> $STDOUT_LOG_FILE 2>> $STDERR_LOG_FILE

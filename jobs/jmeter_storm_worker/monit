@@ -1,0 +1,5 @@
+check process jmeter_storm_worker
+  with pidfile /var/vcap/sys/run/jmeter_storm_worker/pid
+  start program "/var/vcap/jobs/jmeter_storm_worker/bin/ctl start"
+  stop program "/var/vcap/jobs/jmeter_storm_worker/bin/ctl stop"
+  group vcap

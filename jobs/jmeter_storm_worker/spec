@@ -1,5 +1,5 @@
 ---
-name: jmeter_worker
+name: jmeter_storm_worker
 
 templates:
   ctl.erb: bin/ctl

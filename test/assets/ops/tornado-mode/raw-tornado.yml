@@ -1,5 +1,5 @@
 - type: replace
-  path: /instance_groups/name=jmeter_workers/jobs/-
+  path: /instance_groups/name=test_node/jobs/-
   value:
     name: jmeter_tornado
     release: jmeter-tornado

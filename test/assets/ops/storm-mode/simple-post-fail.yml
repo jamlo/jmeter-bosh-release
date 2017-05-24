@@ -1,20 +1,21 @@
 - type: replace
-  path: /instance_groups/name=jmeter_workers/jobs/-
+  path: /instance_groups/name=test_node/jobs/-
   value:
-    name: jmeter_tornado
+    name: jmeter_storm
     release: jmeter-tornado
     properties:
       wizard:
         configuration:
           users: 1
           ramp_time: 1
+          duration: 5
         targets:
-        - name: PUT with Headers and Body
-          url: "http://192.168.50.1:15672/greeting/put/smurf"
-          http_method: PUT
+        - name: POST with Body that will not match
+          url: "http://192.168.50.1:15672/greeting/post/smurf"
+          http_method: POST
           headers:
           - name: "Authorization"
             value: "Basic Y2F0Om1lb3c=" # cat:meow
           options:
             request_body: |
-             {"name" : "i am a put", "age" : 525}
+             {"name" : "i will not match", "age" : 444444}

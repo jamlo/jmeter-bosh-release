@@ -1,5 +1,5 @@
 - type: replace
-  path: /instance_groups/name=jmeter_workers/jobs/-
+  path: /instance_groups/name=test_node/jobs/-
   value:
     name: jmeter_tornado
     release: jmeter-tornado
@@ -9,9 +9,12 @@
           users: 1
           ramp_time: 1
         targets:
-        - name: Simple DELETE - Headers
-          url: "http://192.168.50.1:15672/greeting/delete/protected"
-          http_method: DELETE
+        - name: PUT with Headers and Body
+          url: "http://192.168.50.1:15672/greeting/put/smurf"
+          http_method: PUT
           headers:
           - name: "Authorization"
             value: "Basic Y2F0Om1lb3c=" # cat:meow
+          options:
+            request_body: |
+             {"name" : "will fail", "age" : 5555}

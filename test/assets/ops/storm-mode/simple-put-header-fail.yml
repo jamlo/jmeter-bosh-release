@@ -1,20 +1,21 @@
 - type: replace
-  path: /instance_groups/name=jmeter_workers/jobs/-
+  path: /instance_groups/name=test_node/jobs/-
   value:
-    name: jmeter_tornado
+    name: jmeter_storm
     release: jmeter-tornado
     properties:
       wizard:
         configuration:
           users: 1
           ramp_time: 1
+          duration: 5
         targets:
-        - name: PUT with Headers and Body
+        - name: PUT with Headers expected to fail
           url: "http://192.168.50.1:15672/greeting/put/smurf"
           http_method: PUT
           headers:
           - name: "Authorization"
-            value: "Basic Y2F0Om1lb3c=" # cat:meow
+            value: "Basic willfail"
           options:
             request_body: |
-             {"name" : "will fail", "age" : 5555}
+             {"name" : "i am a put", "age" : 525}

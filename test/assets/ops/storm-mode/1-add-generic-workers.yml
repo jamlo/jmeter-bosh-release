@@ -1,0 +1,13 @@
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: storm_workers
+    instances: 2
+    vm_type: default
+    stemcell: default_stemcell
+    azs: [z1]
+    networks:
+    - name: default
+    jobs:
+    - name: jmeter_storm_worker
+      release: jmeter-tornado

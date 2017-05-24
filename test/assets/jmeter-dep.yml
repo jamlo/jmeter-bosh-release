@@ -16,7 +16,7 @@ update:
   update_watch_time: 1000-60000
 
 instance_groups:
-- name: jmeter_workers
+- name: test_node
   instances: 1
   vm_type: default
   stemcell: default_stemcell

@@ -18,7 +18,7 @@
 ### 1- Storm:
 This mode is used when the collection of the results for JMeter&trade; plan execution is necessary. It works by spinning `n` number of VMs that will act as JMeter&trade; workers. Those VMs will run JMeter&trade; in server mode, and wait for an execution plan to be delivered to them. When all the workers are up, a BOSH errand can be manually triggered where it will send the execution plan to the workers, waits for them to finish execution, collect the results, and download these results to the users local machine.
 
-Release jobs used in this mode: `jmeter_worker` and `jmeter_storm`.
+Release jobs used in this mode: `jmeter_storm_worker` and `jmeter_storm`.
 
 >**Note**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter&trade; jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
 
