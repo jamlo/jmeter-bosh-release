@@ -276,6 +276,12 @@ assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 203'
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 204'
 clean_after_test "$TEST_MODE" "multi-targets.yml"
 
+# ================================================
+# RAW XML PLAN
+deploy "$TEST_MODE/raw-storm.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
+run_errand
+assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
+clean_after_test "$TEST_MODE" "raw-storm.yml"
 
 printf "${GREEN}=========================================================\n"
 printf "${GREEN}Success: All Tests Passed !!!!!!!!!!!!!!!!!!!!\n"
