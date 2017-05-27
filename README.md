@@ -2,8 +2,6 @@
 
 **Tornado for Apache JMeter&trade;**, is a [BOSH](https://bosh.io/) release for [Apache JMeter&trade;](http://jmeter.apache.org/). It simplifies the usage of JMeter&trade; in distributed mode.
 
-**Note: This software is NOT associated with Apache JMeter&trade; software or the Apache Software Foundation.**
-
 ## Features
 
 * Horizontally scale your JMeter&trade; load/stress tests with the power of BOSH.
