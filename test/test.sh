@@ -12,11 +12,13 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 LOG_DIR=./tmp/JMETER-$(uuidgen)
+TEST_WORKSPACE=$LOG_DIR/test_workspace
 mkdir -p $LOG_DIR
+mkdir -p $TEST_WORKSPACE
 printf "${BLUE}Logging to : $LOG_DIR\n${NC}"
 
 printf "Starting Sinatra Server\n"
-ruby ./test/assets/server.rb -o 0.0.0.0 &>$LOG_DIR/sinatra.log &
+ruby ./test/assets/server.rb -o 0.0.0.0 &>$TEST_WORKSPACE/sinatra.log &
 SINATRA_PID=$!
 printf "\n\n\n\n\n"
 
@@ -35,10 +37,9 @@ function restart_sinatra {
   printf "${BLUE}Running : killing sinatra PID '$SINATRA_PID'\n"
   kill -9 $SINATRA_PID
   printf "\n\n\n\n"
-  rm -f $LOG_DIR/sinatra.log
 
   printf "Restarting Sinatra Server\n"
-  ruby ./test/assets/server.rb -o 0.0.0.0 &>$LOG_DIR/sinatra.log &
+  ruby ./test/assets/server.rb -o 0.0.0.0 &>$TEST_WORKSPACE/sinatra.log &
   SINATRA_PID=$!
   printf "\nNew Server PID: $SINATRA_PID\n\n\n\n\n${NC}"
 }
@@ -46,9 +47,10 @@ function restart_sinatra {
 function clean_after_test {
   gobosh delete-deployment --force -n -d jmeter-dep
 
-  mkdir -p "$LOG_DIR/archive"
-  cp "$LOG_DIR/sinatra.log" "$LOG_DIR/archive/sinatra-$1-$2.log"
-
+  mkdir -p "$LOG_DIR/archive/$1-$2"
+  cp -r "$TEST_WORKSPACE/" "$LOG_DIR/archive/$1-$2/"
+  rm -rf $TEST_WORKSPACE
+  mkdir -p $TEST_WORKSPACE
   restart_sinatra
 }
 
@@ -71,7 +73,7 @@ function deploy {
 }
 
 function assert_log_contains {
-  if grep -q "$1" "$LOG_DIR/sinatra.log"; then
+  if grep -q "$1" "$TEST_WORKSPACE/sinatra.log"; then
     printf "${GREEN}I found '$1'\n${NC}"
   else
     printf "${RED}BROKEN: Cannot find '$1' !!\n${NC}"
@@ -79,8 +81,26 @@ function assert_log_contains {
   fi
 }
 
+function assert_errand_result_tarball_contains {
+  tarball_contents=$(tar -ztvf $TEST_WORKSPACE/test_node-*.tgz)
+
+  for var in "$@"
+  do
+    if [[ $tarball_contents == *"$var"* ]]; then
+      printf "${GREEN}I found '$var' in tarball contents\n${NC}"
+    else
+      printf "${RED}BROKEN: Cannot find '$var' in tarball contents !!\n${NC}"
+      exit 1
+    fi
+  done
+}
+
 function run_errand {
   gobosh run-errand test_node -d jmeter-dep
+}
+
+function run_errand_download_logs {
+  gobosh run-errand test_node -d jmeter-dep --download-logs --logs-dir=$TEST_WORKSPACE
 }
 
 # ==========================================================
@@ -114,60 +134,60 @@ TEST_MODE="tornado-mode"
 # GET
 deploy "$TEST_MODE/simple-get.yml"
 assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
-clean_after_test "$TEST_MODE" "simple-get.yml"
+clean_after_test "$TEST_MODE" "simple-get"
 
 # ================================================
 deploy "$TEST_MODE/simple-get-fail.yml"
 assert_log_contains '\"GET /greeting/get/fail HTTP/1.1\" 400'
-clean_after_test "$TEST_MODE" "simple-get-fail.yml"
+clean_after_test "$TEST_MODE" "simple-get-fail"
 
 # ================================================
 deploy "$TEST_MODE/simple-get-with-headers.yml"
 assert_log_contains '\"GET /greeting/get/protected HTTP/1.1\" 200'
-clean_after_test "$TEST_MODE" "simple-get-with-headers.yml"
+clean_after_test "$TEST_MODE" "simple-get-with-headers"
 
 # ================================================
 # DELETE
 deploy "$TEST_MODE/simple-delete.yml"
 assert_log_contains '\"DELETE /greeting/delete/smurf HTTP/1.1\" 200'
-clean_after_test "$TEST_MODE" "simple-delete.yml"
+clean_after_test "$TEST_MODE" "simple-delete"
 
 # ================================================
 deploy "$TEST_MODE/simple-delete-with-headers.yml"
 assert_log_contains '\"DELETE /greeting/delete/protected HTTP/1.1\" 201'
-clean_after_test "$TEST_MODE" "simple-delete-with-headers.yml"
+clean_after_test "$TEST_MODE" "simple-delete-with-headers"
 
 # ================================================
 # PUT
 deploy "$TEST_MODE/simple-put.yml"
 assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 203'
-clean_after_test "$TEST_MODE" "simple-put.yml"
+clean_after_test "$TEST_MODE" "simple-put"
 
 # =================================================
 deploy "$TEST_MODE/simple-put-fail.yml"
 assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 405'
-clean_after_test "$TEST_MODE" "simple-put-fail.yml"
+clean_after_test "$TEST_MODE" "simple-put-fail"
 
 # =================================================
 deploy "$TEST_MODE/simple-put-header-fail.yml"
 assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 401'
-clean_after_test "$TEST_MODE" "simple-put-header-fail.yml"
+clean_after_test "$TEST_MODE" "simple-put-header-fail"
 
 # ================================================
 # POST
 deploy "$TEST_MODE/simple-post.yml"
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 204'
-clean_after_test "$TEST_MODE" "simple-post.yml"
+clean_after_test "$TEST_MODE" "simple-post"
 
 # =================================================
 deploy "$TEST_MODE/simple-post-fail.yml"
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 402'
-clean_after_test "$TEST_MODE" "simple-post-fail.yml"
+clean_after_test "$TEST_MODE" "simple-post-fail"
 
 # =================================================
 deploy "$TEST_MODE/simple-post-header-fail.yml"
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 401'
-clean_after_test "$TEST_MODE" "simple-post-header-fail.yml"
+clean_after_test "$TEST_MODE" "simple-post-header-fail"
 
 # ================================================
 # Multi Targets
@@ -176,13 +196,13 @@ assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
 assert_log_contains '\"DELETE /greeting/delete/smurf HTTP/1.1\" 200'
 assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 203'
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 204'
-clean_after_test "$TEST_MODE" "multi-targets.yml"
+clean_after_test "$TEST_MODE" "multi-targets"
 
 # ================================================
 # RAW XML PLAN
 deploy "$TEST_MODE/raw-tornado.yml"
 assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
-clean_after_test "$TEST_MODE" "raw-tornado.yml"
+clean_after_test "$TEST_MODE" "raw-tornado"
 
 
 # ==================================================================================================
@@ -201,70 +221,70 @@ TEST_MODE="storm-mode"
 deploy "$TEST_MODE/simple-get.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
-clean_after_test "$TEST_MODE" "simple-get.yml"
+clean_after_test "$TEST_MODE" "simple-get"
 
 # ================================================
 deploy "$TEST_MODE/simple-get-fail.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"GET /greeting/get/fail HTTP/1.1\" 400'
-clean_after_test "$TEST_MODE" "simple-get-fail.yml"
+clean_after_test "$TEST_MODE" "simple-get-fail"
 
 # ================================================
 deploy "$TEST_MODE/simple-get-with-headers.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"GET /greeting/get/protected HTTP/1.1\" 200'
-clean_after_test "$TEST_MODE" "simple-get-with-headers.yml"
+clean_after_test "$TEST_MODE" "simple-get-with-headers"
 
 # ================================================
 # DELETE
 deploy "$TEST_MODE/simple-delete.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"DELETE /greeting/delete/smurf HTTP/1.1\" 200'
-clean_after_test "$TEST_MODE" "simple-delete.yml"
+clean_after_test "$TEST_MODE" "simple-delete"
 
 # ================================================
 deploy "$TEST_MODE/simple-delete-with-headers.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"DELETE /greeting/delete/protected HTTP/1.1\" 201'
-clean_after_test "$TEST_MODE" "simple-delete-with-headers.yml"
+clean_after_test "$TEST_MODE" "simple-delete-with-headers"
 
 # ================================================
 # PUT
 deploy "$TEST_MODE/simple-put.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 203'
-clean_after_test "$TEST_MODE" "simple-put.yml"
+clean_after_test "$TEST_MODE" "simple-put"
 
 # =================================================
 deploy "$TEST_MODE/simple-put-fail.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 405'
-clean_after_test "$TEST_MODE" "simple-put-fail.yml"
+clean_after_test "$TEST_MODE" "simple-put-fail"
 
 # =================================================
 deploy "$TEST_MODE/simple-put-header-fail.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 401'
-clean_after_test "$TEST_MODE" "simple-put-header-fail.yml"
+clean_after_test "$TEST_MODE" "simple-put-header-fail"
 
 # ================================================
 # POST
 deploy "$TEST_MODE/simple-post.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 204'
-clean_after_test "$TEST_MODE" "simple-post.yml"
+clean_after_test "$TEST_MODE" "simple-post"
 
 # =================================================
 deploy "$TEST_MODE/simple-post-fail.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 402'
-clean_after_test "$TEST_MODE" "simple-post-fail.yml"
+clean_after_test "$TEST_MODE" "simple-post-fail"
 
 # =================================================
 deploy "$TEST_MODE/simple-post-header-fail.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 401'
-clean_after_test "$TEST_MODE" "simple-post-header-fail.yml"
+clean_after_test "$TEST_MODE" "simple-post-header-fail"
 
 # ================================================
 # Multi Targets
@@ -274,14 +294,25 @@ assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
 assert_log_contains '\"DELETE /greeting/delete/smurf HTTP/1.1\" 200'
 assert_log_contains '\"PUT /greeting/put/smurf HTTP/1.1\" 203'
 assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 204'
-clean_after_test "$TEST_MODE" "multi-targets.yml"
+clean_after_test "$TEST_MODE" "multi-targets"
 
-# ================================================
-# RAW XML PLAN
+================================================
+RAW XML PLAN
 deploy "$TEST_MODE/raw-storm.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
-clean_after_test "$TEST_MODE" "raw-storm.yml"
+clean_after_test "$TEST_MODE" "raw-storm"
+
+# =================================================
+# Generate Dashboard
+deploy "$TEST_MODE/simple-get.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml" "$TEST_MODE/3-generate-dashboard.yml"
+run_errand_download_logs
+assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
+assert_errand_result_tarball_contains "jmeter_storm/jmeter.log" \
+      "jmeter_storm/jmeter_storm.stderr.log" \
+      "dashboard/content" \
+      "jmeter_storm/log.jtl" "hahahahah"
+clean_after_test "$TEST_MODE" "generate-dashboard"
 
 printf "${GREEN}=========================================================\n"
 printf "${GREEN}Success: All Tests Passed !!!!!!!!!!!!!!!!!!!!\n"
