@@ -297,7 +297,7 @@ assert_log_contains '\"POST /greeting/post/smurf HTTP/1.1\" 204'
 clean_after_test "$TEST_MODE" "multi-targets"
 
 #================================================
-RAW XML PLAN
+# RAW XML PLAN
 deploy "$TEST_MODE/raw-storm.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
 run_errand
 assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
@@ -311,7 +311,7 @@ assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
 assert_errand_result_tarball_contains "jmeter_storm/jmeter.log" \
       "jmeter_storm/jmeter_storm.stderr.log" \
       "dashboard/content" \
-      "jmeter_storm/log.jtl" "hahahahah"
+      "jmeter_storm/log.jtl"
 clean_after_test "$TEST_MODE" "generate-dashboard"
 
 printf "${GREEN}=========================================================\n"
