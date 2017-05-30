@@ -1,30 +1,27 @@
-# Instance Group Section of the Deployment manifest
-# For test_plan_xml, create it using the JMeter GUI, it will be the contents
-# of the .jmx file created by JMeter. Make sure it does NOT loop forever in
-# this mode because the errand will never stop running.
+# Instance Group Section of the Deployment manifest for Storm Mode
+# Check README.md for properites examples
 
 instance_groups:
-  - name: workers
-    instances: 3
-    vm_type: default
-    stemcell: default_stemcell
-    azs: [z1]
-    networks:
-    - name: default
-    jobs:
-    - name: jmeter_storm_worker
+- name: workers
+  instances: 3
+  vm_type: default
+  stemcell: default_stemcell
+  azs: [z1]
+  networks:
+  - name: default
+  jobs:
+  - name: jmeter_storm_worker
+    release: jmeter-tornado
 
-  - name: storm
-    instances: 1
-    lifecycle: errand
-    vm_type: default
-    stemcell: default_stemcell
-    azs: [z1]
-    networks:
-    - name: default
-    jobs:
-    - name: jmeter_storm
-      properties:
-        generate_dashboard: true # Generates static html pages with the results graphs
-        test_plan_xml: |
-          {REPLACE WITH YOU OWN JMX PLAN}
+- name: storm
+  instances: 1
+  lifecycle: errand
+  vm_type: default
+  stemcell: default_stemcell
+  azs: [z1]
+  networks:
+  - name: default
+  jobs:
+  - name: jmeter_storm
+    release: jmeter-tornado
+    properties: .....

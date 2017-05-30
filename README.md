@@ -7,8 +7,9 @@
 * Horizontally scale your JMeter&trade; load/stress tests with the power of BOSH.
 * Deploy onto multiple IaaS offerings (wherever BOSH can be deployed: AWS, Microsoft Azure, Google Compute Engine, OpenStack, etc).
 * Distribute the source traffic of your load tests across multiple regions and IaaS.
+* Easily create JMeter&trade; tests plans, or supply a pre-built test plan.
 * Tune the JVM options for JMeter&trade; from your BOSH deployment manifest (no VM SSHing is needed).
-* The load/stress tests results will be automatically downloaded to your local machine (optional dashboard can be generated).
+* Download test results directly to your local machine (optional dashboard can be generated).
 * Offered in 2 modes: [`Storm`](#1--storm) and [`Tornado`](#2--tornado) modes.
 
 ## Modes:
@@ -18,38 +19,122 @@ This mode is used when the collection of the results for JMeter&trade; plan exec
 
 Release jobs used in this mode: `jmeter_storm_worker` and `jmeter_storm`.
 
->**Note**: All the workers VMs and the Errand VM should be in the same subnet. Also, the JMeter&trade; jmx plan should have a definite number of loops and should not be set to loop forever; else the errand execution will never end.
+>**Note**: The worker VMs and the Errand VM should be in the same subnet. Also, if you're supplying a pre-built JMeter&trade; jmx plan, it should have a definite number of loops and should not be set to loop forever, else the errand execution will never end.
 
-An snippet of a deployment manifest for this mode can be found [here](docs/storm-mode/sample-deployment-manifests-snippets.yml).
+A snippet of a deployment manifest for this mode can be found [here](docs/storm-mode/sample-deployment-manifests-snippets.yml).
 
 ### 2- Tornado:
 This mode is more suitable in the scenario where the simulation of large number of active users is more important than collecting the results logs; for example, detecting the behaviour of an application under continuous heavy traffic. An `n` number of VMs will start, each provided the same execution plan, where they will loop indefinitely. You can tune the number of working VMs directly through BOSH.
 
 Release jobs used in this mode: `jmeter_tornado`.
 
->**Note**: The JMeter&trade; execution plan should set the `loop indefinitely` flag to true.
+>**Note**: If you are supplying a pre-built JMeter&trade; jmx plan, it should set the `loop indefinitely` flag to true.
 
-An snippet of a deployment manifest for this mode can be found [here](docs/tornado-mode/sample-deployment-manifests-snippets.yml).
+A snippet of a deployment manifest for this mode can be found [here](docs/tornado-mode/sample-deployment-manifests-snippets.yml).
 
-## Getting Started - AWS Example
+## Getting Started
+### 1- Prerequisites
+1. Deploy BOSH on your preffered IAAS. Detailed instructions can be found [here](https://github.com/cloudfoundry/bosh-deployment).
+2. Consult [BOSH offical website](https://bosh.io) for more details.
 
-### Prerequisites
-1. Deploy [BOSH to AWS](http://bosh.io/docs/init-aws.html)
-2. Upload the latest [Ubuntu AWS stemcell](https://bosh.io/stemcells/bosh-aws-xen-hvm-ubuntu-trusty-go_agent)
-3. Upload a [Cloud Config](https://bosh.io/docs/cloud-config.html).
+### 2- Choose a Mode
+Choose a [mode](#modes) that suites your objective.
 
-### Preparing the Test
+### 3- Create a Test Plan
+To create a test plan, you have 2 options:
+1. **Using the Wizard** : Through YAML, a test plan can be supplied to the running job. Internally, this YAML representation will be transformed to a **JMX** plan. Check the [examples](#examples) for sample job properties.
+2. **Pre-Built JMX Plan**: Using JMeter GUI, create a test plan. An example how-to can be found [here](http://jmeter.apache.org/usermanual/build-web-test-plan.html). Save the plan, it should be in a `.jmx` file (xml). This JMX XML plan will be supplied as a property of your job.
 
-1. **Build a Test Plan:** Using JMeter GUI, create a test plan. An example how-to can be found [here](http://jmeter.apache.org/usermanual/build-web-test-plan.html). Save the plan, it should be in a `.jmx` file (xml).
-
-2. **Choosing a Mode:** Choose a [mode](#modes) that suites your objective. Then build a bosh deployment manifest accordingly. You will need the plan created in step 1.
-
-3. **Run the Plan:** Using BOSH CLI, run your plan accordingly.
+### 4- Run your test
+Dependending on the mode you chose, deploy the manifest and run accordingly.
 
 ## Notes
 
 1. Use a reliable DNS server in your BOSH networks settings; for example Google's `8.8.8.8` DNS server. This will limit the overhead that may occurred during DNS lookup, thus making the test results more realistic.
 2. In an effort to mimic a realistic network traffic source, multiple deployments of **Tornado for Apache&trade; JMeter&trade;** can be located on multiple IAAS and regions.
+
+## Examples
+
+### Storm Mode - Supported HTTP Methods _'GET'_, _'PUT'_, _'POST'_, _'DELETE'_
+```yaml
+name: jmeter_storm
+release: jmeter-tornado
+properties:
+  generate_dashboard: true
+  wizard:
+    configuration:
+      users: 50 # Number of users per VM
+      ramp_time: 20 # In seconds
+      duration: 600 # Test duration in seconds
+    targets:
+    - name: GET with Headers
+      url: "http://api.example.com:8080/greeting/get/"
+      http_method: GET
+      headers:
+      - name: "Authorization"
+        value: "Basic Y2F0Om1lb3c="
+```
+
+```yaml
+name: jmeter_storm
+release: jmeter-tornado
+properties:
+  generate_dashboard: true
+  wizard:
+    configuration:
+      users: 100
+      ramp_time: 30
+      duration: 300
+    targets:
+    - name: POST with Headers and Body
+      url: "http://api.example.com:8080/greeting/post/"
+      http_method: POST
+      headers:
+      - name: "Authorization"
+        value: "Basic Y2F0Om1lb3c="
+      options:
+        request_body: |
+         {"name" : "i am a post", "age" : 425}
+```
+
+### Tornado Mode - Supported HTTP Methods _'GET'_, _'PUT'_, _'POST'_, _'DELETE'_
+
+```yaml
+name: jmeter_tornado
+release: jmeter-tornado
+properties:
+  wizard:
+    configuration:
+      users: 50
+      ramp_time: 30
+    targets:
+    - name: GET with Headers
+      url: "http://api.example.com:8080/greeting/get/"
+      http_method: GET
+      headers:
+      - name: "Authorization"
+        value: "Basic Y2F0Om1lb3c="
+```
+
+```yaml
+name: jmeter_tornado
+release: jmeter-tornado
+properties:
+  wizard:
+    configuration:
+      users: 70
+      ramp_time: 20
+    targets:
+    - name: PUT with Headers and Body
+      url: "http://api.example.com:8080/greeting/put/"
+      http_method: PUT
+      headers:
+      - name: "Authorization"
+        value: "Basic Y2F0Om1lb3c="
+      options:
+        request_body: |
+         {"name" : "i am a put", "age" : 525}
+```
 
 ## License
 
