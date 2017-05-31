@@ -142,3 +142,4 @@ Apache&trade; License, Version 2.0. See the [LICENSE](LICENSE) and [NOTICE](NOTI
 
 ## Foot Notes:
 Apache, Apache JMeter, and JMeter are trademarks of the Apache Software Foundation(ASF)
+This project uses [Ruby JMeter](https://github.com/flood-io/ruby-jmeter). See [License](https://github.com/flood-io/ruby-jmeter/blob/master/LICENSE.txt) for more details  
