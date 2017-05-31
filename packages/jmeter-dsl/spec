@@ -1,0 +1,8 @@
+---
+name: jmeter-dsl
+
+dependencies:
+- ruby-jmeter
+
+files:
+- jmeter-dsl/**/*

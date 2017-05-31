@@ -1,27 +1,30 @@
 #!/bin/bash
+set -e
+
 export PATH=/var/vcap/packages/openjdk/bin:$PATH
+export PATH=/var/vcap/packages/ruby-jmeter/bin:$PATH
 
 JOB_NAME=jmeter_tornado
 RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
 LOGDATE=$(date +%Y-%m-%dT%H-%M-%S)
 LOG_DIR=/var/vcap/sys/log/${JOB_NAME}/log_${LOGDATE}
 PIDFILE=${RUN_DIR}/pid
+JMX_PLAN_FILE=${RUN_DIR}/plan.jmx
 
 # JMeter Options
-JMX_PLAN=/var/vcap/jobs/${JOB_NAME}/bin/test_plan.jmx
-PLAN_EXECUTION_LOG_FILE=$LOG_DIR/log.jtl
+PLAN_EXECUTION_RESULT_FILE=$LOG_DIR/log.jtl
 JMETER_LOG_FILE=$LOG_DIR/jmeter.log
 STDOUT_LOG_FILE=$LOG_DIR/${JOB_NAME}.stdout.log
 STDERR_LOG_FILE=$LOG_DIR/${JOB_NAME}.stderr.log
-GENERATE_LOGS=<% if p('record_result') %>"-l $PLAN_EXECUTION_LOG_FILE"<%end%>
+GENERATE_LOGS=<% if p('record_result') %>"-l $PLAN_EXECUTION_RESULT_FILE"<%end%>
 
 # JAVA options
-XMS="-Xms<%=p('jvm_xms')%>"
-XMX="-Xmx<%=p('jvm_xmx')%>"
-TENURING="-XX:MaxTenuringThreshold=<%=p('jvm_maxTenuringThreshold')%>"
+SERVER="-server" # optimize JAVA performance
+XMS="-Xms<%=p('jvm.xms')%>"
+XMX="-Xmx<%=p('jvm.xmx')%>"
+TENURING="-XX:MaxTenuringThreshold=<%=p('jvm.maxTenuringThreshold')%>"
 CLASS_UNLOAD="-XX:+CMSClassUnloadingEnabled"
 DUMP="-XX:+HeapDumpOnOutOfMemoryError"
-SERVER="-server" # optimize JAVA performance
 JVM_ARGS="$SERVER $XMS $XMX $TENURING $CLASS_UNLOAD $DUMP"
 
 case $1 in
@@ -33,9 +36,19 @@ case $1 in
 
     echo $$ > $PIDFILE
 
+    <%if_p('raw_jmx_plan') do%>
+    cp /var/vcap/jobs/${JOB_NAME}/config/raw_test_plan.jmx $JMX_PLAN_FILE
+    <%end.else do%>
+    ruby /var/vcap/packages/jmeter-dsl/jmx_plan_generator.rb \
+         "/var/vcap/jobs/${JOB_NAME}/config/settings.json" \
+         "$JMX_PLAN_FILE" \
+         >> $STDOUT_LOG_FILE \
+         2>> $STDERR_LOG_FILE
+    <%end%>
+
     pushd /var/vcap/packages/jmeter/bin
 
-    exec java $JVM_ARGS -jar "ApacheJMeter.jar" -n -t $JMX_PLAN -j $JMETER_LOG_FILE $GENERATE_LOGS >> $STDOUT_LOG_FILE 2>> $STDERR_LOG_FILE
+    exec java $JVM_ARGS -jar "ApacheJMeter.jar" -n -t $JMX_PLAN_FILE -j $JMETER_LOG_FILE $GENERATE_LOGS >> $STDOUT_LOG_FILE 2>> $STDERR_LOG_FILE
 
     ;;
 
@@ -45,6 +58,7 @@ case $1 in
       pid=$(head -n 1 $PIDFILE)
       kill -9 $pid
       rm -f $PIDFILE
+      rm -f $JMX_PLAN_FILE
       echo "Process $pid killed... well probably"
     else
       echo "Unable to find PIDFILE: $PIDFILE"

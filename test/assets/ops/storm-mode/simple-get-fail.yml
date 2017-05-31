@@ -1,0 +1,15 @@
+- type: replace
+  path: /instance_groups/name=test_node/jobs/-
+  value:
+    name: jmeter_storm
+    release: jmeter-tornado
+    properties:
+      wizard:
+        configuration:
+          users: 1
+          ramp_time: 1
+          duration: 5
+        targets:
+        - name: Simple Get Fail
+          url: "http://192.168.50.1:15672/greeting/get/fail"
+          http_method: GET

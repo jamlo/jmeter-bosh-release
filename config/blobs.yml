@@ -6,3 +6,11 @@ openjdk/openjdk-1.8.0_101-x86_64-trusty.tar.gz:
   size: 77696717
   object_id: b9565d3c-8899-41ea-440d-2ff2d84269a3
   sha: d77ee059e289ae52fb87812f1a2932268427dc26
+ruby/ruby-2.3.3.tar.gz:
+  size: 17813577
+  object_id: 0472038f-f01e-4c90-5f67-e721d22ec09f
+  sha: 1014ee699071aa2ddd501907d18cbe15399c997d
+ruby/rubygems-2.6.8.tgz:
+  size: 754300
+  object_id: b129f988-f5d7-405e-6743-820b9217881b
+  sha: d253fd1caca6103a9e2a69127ac158a3745fbb44

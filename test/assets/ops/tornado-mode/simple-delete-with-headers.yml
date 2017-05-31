@@ -1,0 +1,17 @@
+- type: replace
+  path: /instance_groups/name=test_node/jobs/-
+  value:
+    name: jmeter_tornado
+    release: jmeter-tornado
+    properties:
+      wizard:
+        configuration:
+          users: 1
+          ramp_time: 1
+        targets:
+        - name: Simple DELETE - Headers
+          url: "http://192.168.50.1:15672/greeting/delete/protected"
+          http_method: DELETE
+          headers:
+          - name: "Authorization"
+            value: "Basic Y2F0Om1lb3c=" # cat:meow

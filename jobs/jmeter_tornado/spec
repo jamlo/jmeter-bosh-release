@@ -3,22 +3,82 @@ name: jmeter_tornado
 
 templates:
   ctl.erb: bin/ctl
-  test_plan.jmx.erb: bin/test_plan.jmx
+  settings.json.erb: config/settings.json
+  validation.txt.erb: config/validation.txt
+  raw_test_plan.jmx.erb: config/raw_test_plan.jmx
 
 packages:
 - jmeter
 - openjdk
+- ruby-jmeter
+- jmeter-dsl
 
 properties:
-  test_plan_xml:
-    description: The JMeter test plan. Generate it using JMeter GUI. This is the contents of the .jmx file.
+  # ==================================================================================================
+  # ==================================================================================================
+  # Raw JMX Test Plan Options
+  raw_jmx_plan:
+    description: |
+      The JMeter test plan. Generate it using JMeter GUI. This is the contents of the .jmx file.
+      Either specify this field or use the wizard option.
 
-  record_result:
-    description: "Set to true if you want to record the execution plan results. Warning: logs can grow in size very quickly, resulting in full disk."
-    default: false
+  # ==================================================================================================
+  # ==================================================================================================
+  # Wizard Options
+  wizard.targets:
+    description: List of targets to hits
+    help: |
+      A target has the following fields:
+        - name: { Unique name of the target}
+          url: { URL to hit }
+          http_method: {HTTP Method. Supportted methods: GET|DELETE|POST|PUT }
+          headers: { A list of HTTP headers. Each with a name and value }
+          - name: { header name }
+            value: { header value }
+          options: { Other options. Only supported option is 'request_body' for PUT and POST }
+            request_body: String
 
-  jvm_xms:
-    description: Xms value passed
+      An example target:
+        - name: Example 1
+          url: "https://192.168.50.1:15672/greeting/post/smurf"
+          http_method: POST
+          headers:
+          - name: "Authorization"
+            value: "Basic Y2F0Om1lb3c="
+          options:
+            request_body: |
+              {"name" : "i am a post", "age" : 425}
+
+  wizard.configuration.users:
+    description: Number of threads JMeter will use to execute your test, per job instance.
+    help: |
+      As Describe by JMeter Documentation
+        "Number of threads JMeter will use to execute your test. Each thread simulates a user. Each
+        thread will execute the test plan in its entirety and completely independently of other test
+        threads. Multiple threads are used to simulate concurrent connections to your server application.""
+
+  wizard.configuration.ramp_time:
+    description: Test ramp up time
+    help: |
+      Taken From JMeter Documention
+        "The ramp-up period tells JMeter how long to take to "ramp-up" to the full number of threads
+        chosen. If 10 threads are used, and the ramp-up period is 100 seconds, then JMeter will take
+        100 seconds to get all 10 threads up and running. Each thread will start 10 (100/10) seconds
+        after the previous thread was begun. If there are 30 threads and a ramp-up period of 120 seconds,
+        then each successive thread will be delayed by 4 seconds.
+
+        Ramp-up needs to be long enough to avoid too large a work-load at the start of a test, and
+        short enough that the last threads start running before the first ones finish (unless one
+        wants that to happen).
+
+        Start with Ramp-up = number of threads and adjust up or down as needed."
+
+
+  # ==================================================================================================
+  # ==================================================================================================
+  # JVM Options
+  jvm.xms:
+    description: "Xms value passed"
     default: 512m
     help: |
       This Description was taken from the scripts provided by JMeter:
@@ -45,8 +105,8 @@ properties:
       # This is the base heap size -- you may increase or decrease it to fit your
       # system's memory availability: -Xms512m -Xmx512m
 
-  jvm_xmx:
-    description: -Xmx value passed
+  jvm.xmx:
+    description: "Xmx value passed"
     default: 512m
     help: |
       This Description was taken from the scripts provided by JMeter:
@@ -73,8 +133,8 @@ properties:
       # This is the base heap size -- you may increase or decrease it to fit your
       # system's memory availability: -Xms512m -Xmx512m
 
-  jvm_maxTenuringThreshold:
-    description: JAVA Max Tenuring Threshold
+  jvm.maxTenuringThreshold:
+    description: "JAVA Max Tenuring Threshold"
     default: 2
     help: |
       This Description was taken from the scripts provided by JMeter:
@@ -88,3 +148,10 @@ properties:
       # in tenuring longer than the life of per-sample objects -- which is hopefully
       # shorter than the period between two scavenges):
       # TENURING="-XX:MaxTenuringThreshold=2"
+
+  # ==================================================================================================
+  # ==================================================================================================
+  # Misc
+  record_result:
+    description: "Not recommended. Set to true if you want to record the execution plan results. Warning: logs can grow in size very quickly, resulting in full disk."
+    default: false

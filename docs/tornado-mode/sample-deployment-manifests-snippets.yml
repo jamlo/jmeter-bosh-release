@@ -1,16 +1,14 @@
-# Instance Group Section of the Deployment manifest
-# For test_plan_xml, create it using the JMeter GUI, it will be the contents
-# of the .jmx file created by JMeter. Make sure it loop forever in this mode.
+# Instance Group Section of the Deployment manifest for Tornado Mode
+# Check README.md for properites examples
 instance_groups:
-  - name: jmeter_launchers
-    instances: 1
-    vm_type: default
-    stemcell: default_stemcell
-    azs: [z1]
-    networks:
-    - name: default
-    jobs:
-    - name: jmeter_tornado
-      properties:
-        test_plan_xml: |
-          {Your JMX Plan here}
+- name: jmeter_launchers
+  instances: 1
+  vm_type: default
+  stemcell: default_stemcell
+  azs: [z1]
+  networks:
+  - name: default
+  jobs:
+  - name: jmeter_tornado
+    release: jmeter-tornado
+    properties: ....

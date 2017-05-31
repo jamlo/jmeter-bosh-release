@@ -1,0 +1,21 @@
+<%=
+
+if_p('raw_jmx_plan') do
+  if_p('wizard.targets') do
+    raise "Simulatanously specifying a raw jmx plan and a wizard. Can not decide which option to run tests with."
+  end
+end
+
+validation_result = ''
+
+if_p('wizard.targets') do
+  validation_result = "The JMX Test plans will be generated on behalf of the user; using the wizard parameters provided."
+end.else_if_p("raw_jmx_plan") do
+  validation_result = "The JMX Test plan provided by the user will be used to run the tests."
+end.else do
+  raise "Should either specify a raw JMX test plan or use the wizard options to set the test plan."
+end
+
+validation_result
+
+%>

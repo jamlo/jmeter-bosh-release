@@ -13,4 +13,4 @@ releases/**/*.tgz
 *~
 *#
 #*
-
+tmp/

@@ -1,0 +1,20 @@
+- type: replace
+  path: /instance_groups/name=test_node/jobs/-
+  value:
+    name: jmeter_tornado
+    release: jmeter-tornado
+    properties:
+      wizard:
+        configuration:
+          users: 1
+          ramp_time: 1
+        targets:
+        - name: POST with Body that will not match
+          url: "http://192.168.50.1:15672/greeting/post/smurf"
+          http_method: POST
+          headers:
+          - name: "Authorization"
+            value: "Basic Y2F0Om1lb3c=" # cat:meow
+          options:
+            request_body: |
+             {"name" : "i will not match", "age" : 444444}

@@ -3,19 +3,160 @@ name: jmeter_storm
 
 templates:
   run.erb: bin/run
-  test_plan.jmx.erb: bin/test_plan.jmx
+  settings.json.erb: config/settings.json
+  validation.txt.erb: config/validation.txt
+  raw_test_plan.jmx.erb: config/raw_test_plan.jmx
 
 packages:
 - jmeter
 - openjdk
+- ruby-jmeter
+- jmeter-dsl
 
 consumes:
 - name: jmeter_server
   type: jmeter_server
 
 properties:
-  test_plan_xml:
-    description: The JMeter test plan. Generate it using JMeter GUI.
+  # ==================================================================================================
+  # ==================================================================================================
+  # Raw JMX Test Plan Options
+  raw_jmx_plan:
+    description: |
+      The JMeter test plan. Generate it using JMeter GUI. This is the contents of the .jmx file.
+      Either specify this field or use the wizard option.
+
+  # ==================================================================================================
+  # ==================================================================================================
+  # Wizard Options
+  wizard.targets:
+    description: List of targets to hit
+    help: |
+      A target has the following fields:
+        - name: { Unique name of the target}
+          url: { URL to hit }
+          http_method: {HTTP Method. Supportted methods: GET|DELETE|POST|PUT }
+          headers: { A list of HTTP headers. Each with a name and value }
+          - name: { header name }
+            value: { header value }
+          options: { Other options. Only supported option is 'request_body' for PUT and POST }
+            request_body: String
+
+      An example target:
+        - name: Example 1
+          url: "https://192.168.50.1:15672/greeting/post/smurf"
+          http_method: POST
+          headers:
+          - name: "Authorization"
+            value: "Basic Y2F0Om1lb3c="
+          options:
+            request_body: |
+              {"name" : "i am a post", "age" : 425}
+
+  wizard.configuration.users:
+    description: Number of threads JMeter will use to execute your test, per job instance.
+    help: |
+      As Describe by JMeter Documentation
+        "Number of threads JMeter will use to execute your test. Each thread simulates a user. Each
+        thread will execute the test plan in its entirety and completely independently of other test
+
+  wizard.configuration.duration:
+    description: Desired duration of the test run, in seconds
+
+  wizard.configuration.ramp_time:
+    description: Test ramp up time in seconds
+    help: |
+      Taken From JMeter Documention
+        "The ramp-up period tells JMeter how long to take to "ramp-up" to the full number of threads
+        chosen. If 10 threads are used, and the ramp-up period is 100 seconds, then JMeter will take
+        100 seconds to get all 10 threads up and running. Each thread will start 10 (100/10) seconds
+        after the previous thread was begun. If there are 30 threads and a ramp-up period of 120 seconds,
+        then each successive thread will be delayed by 4 seconds.
+
+        Ramp-up needs to be long enough to avoid too large a work-load at the start of a test, and
+        short enough that the last threads start running before the first ones finish (unless one
+        wants that to happen).
+
+        Start with Ramp-up = number of threads and adjust up or down as needed."
+
+# ==================================================================================================
+# ==================================================================================================
+# Dashboard
   generate_dashboard:
     description: Apply "--reportatendofloadtests" when running jmeter
     default: false
+
+  # ==================================================================================================
+  # ==================================================================================================
+  # JVM Options
+  jvm.xms:
+    description: "Xms value passed"
+    default: 512m
+    help: |
+      This Description was taken from the scripts provided by JMeter:
+      # =====================================================
+      # The following should be reasonably good values for most tests running
+      # on Sun JVMs. Following is the analysis on which it is based. If it's total
+      # gibberish to you, please study my article at
+      # http://www.atg.com/portal/myatg/developer?paf_dm=full&paf_gear_id=1100010&detailArticle=true&id=9606
+      # Original page has disappeared, it is now only available at:
+      # https://web.archive.org/web/20060614151434/http://www.atg.com/portal/myatg/developer?paf_dm=full&paf_gear_id=1100010&detailArticle=true&id=9606
+      #
+      # JMeter objects can generally be grouped into three life-length groups:
+      #
+      # - Per-sample objects (results, DOMs,...). An awful lot of those.
+      #   Life length of milliseconds to a few seconds.
+      #
+      # - Per-run objects (threads, listener data structures,...). Not that many
+      #   of those unless we use the table or tree listeners on heavy runs.
+      #   Life length of minutes to several hours, from creation to start of next run.
+      #
+      # - Per-work-session objects (test plans, GUIs,...).
+      #   Life length: for the life of the JVM.
+      #
+      # This is the base heap size -- you may increase or decrease it to fit your
+      # system's memory availability: -Xms512m -Xmx512m
+
+  jvm.xmx:
+    description: "Xmx value passed"
+    default: 512m
+    help: |
+      This Description was taken from the scripts provided by JMeter:
+      # =====================================================
+      # The following should be reasonably good values for most tests running
+      # on Sun JVMs. Following is the analysis on which it is based. If it's total
+      # gibberish to you, please study my article at
+      # http://www.atg.com/portal/myatg/developer?paf_dm=full&paf_gear_id=1100010&detailArticle=true&id=9606
+      # Original page has disappeared, it is now only available at:
+      # https://web.archive.org/web/20060614151434/http://www.atg.com/portal/myatg/developer?paf_dm=full&paf_gear_id=1100010&detailArticle=true&id=9606
+      #
+      # JMeter objects can generally be grouped into three life-length groups:
+      #
+      # - Per-sample objects (results, DOMs,...). An awful lot of those.
+      #   Life length of milliseconds to a few seconds.
+      #
+      # - Per-run objects (threads, listener data structures,...). Not that many
+      #   of those unless we use the table or tree listeners on heavy runs.
+      #   Life length of minutes to several hours, from creation to start of next run.
+      #
+      # - Per-work-session objects (test plans, GUIs,...).
+      #   Life length: for the life of the JVM.
+      #
+      # This is the base heap size -- you may increase or decrease it to fit your
+      # system's memory availability: -Xms512m -Xmx512m
+
+  jvm.maxTenuringThreshold:
+    description: "JAVA Max Tenuring Threshold"
+    default: 2
+    help: |
+      This Description was taken from the scripts provided by JMeter:
+      # =====================================================
+      # Think about it: trying to keep per-run objects in tenuring definitely
+      # represents a cost, but where's the benefit? They won't disappear before
+      # the test is over, and at that point we will no longer care about performance.
+      #
+      # So we will have JMeter do an explicit Full GC before starting a test run,
+      # but then we won't make any effort (or spend any CPU) to keep objects
+      # in tenuring longer than the life of per-sample objects -- which is hopefully
+      # shorter than the period between two scavenges):
+      # TENURING="-XX:MaxTenuringThreshold=2"

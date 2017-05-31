@@ -1,0 +1,3 @@
+- type: replace
+  path: /instance_groups/name=test_node/jobs/name=jmeter_storm/properties/generate_dashboard?
+  value: true
