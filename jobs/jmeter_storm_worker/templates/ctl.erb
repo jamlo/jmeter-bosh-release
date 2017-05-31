@@ -7,9 +7,9 @@ LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
 PIDFILE=${RUN_DIR}/pid
 
 # JAVA options
-XMS="-Xms<%=p('jvm_xms')%>"
-XMX="-Xmx<%=p('jvm_xmx')%>"
-TENURING="-XX:MaxTenuringThreshold=<%=p('jvm_maxTenuringThreshold')%>"
+XMS="-Xms<%=p('jvm.xms')%>"
+XMX="-Xmx<%=p('jvm.xmx')%>"
+TENURING="-XX:MaxTenuringThreshold=<%=p('jvm.maxTenuringThreshold')%>"
 CLASS_UNLOAD="-XX:+CMSClassUnloadingEnabled"
 DUMP="-XX:+HeapDumpOnOutOfMemoryError"
 SERVER="-server" # optimize JAVA performance

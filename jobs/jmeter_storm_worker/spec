@@ -17,7 +17,7 @@ properties:
     description: Port that the jmeter server will listen on
     default: 1099
 
-  jvm_xms:
+  jvm.xms:
     description: Xms value passed
     default: 512m
     help: |
@@ -45,7 +45,7 @@ properties:
       # This is the base heap size -- you may increase or decrease it to fit your
       # system's memory availability: -Xms512m -Xmx512m
 
-  jvm_xmx:
+  jvm.xmx:
     description: -Xmx value passed
     default: 512m
     help: |
@@ -73,7 +73,7 @@ properties:
       # This is the base heap size -- you may increase or decrease it to fit your
       # system's memory availability: -Xms512m -Xmx512m
 
-  jvm_maxTenuringThreshold:
+  jvm.maxTenuringThreshold:
     description: JAVA Max Tenuring Threshold
     default: 2
     help: |
