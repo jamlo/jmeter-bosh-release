@@ -84,7 +84,7 @@ properties:
 # Dashboard
   generate_dashboard:
     description: Apply "--reportatendofloadtests" when running jmeter
-    default: false
+    default: true
 
   # ==================================================================================================
   # ==================================================================================================
