@@ -60,6 +60,30 @@ properties:
         "Number of threads JMeter will use to execute your test. Each thread simulates a user. Each
         thread will execute the test plan in its entirety and completely independently of other test
 
+  wizard.configuration.simple_delay:
+    description: Delay introduced between http requests, in milliseconds
+    default: -1
+
+  wizard.configuration.gaussian_random_timer.deviation:
+    description: Deviation in milliseconds.
+    default: -1
+    help: |
+      Gaussian Random Timer
+      This timer pauses each thread request for a random amount of time, with most of the time intervals occurring
+      near a particular value. The total delay is the sum of the Gaussian distributed value (with mean 0.0 and
+      standard deviation 1.0) times the deviation value you specify, and the offset value. Another way to explain
+      it, in Gaussian Random Timer, the variation around constant offset has a gaussian curve distribution.
+
+  wizard.configuration.gaussian_random_timer.constant_delay_offset:
+    description: Number of milliseconds to pause in addition to the random delay
+    default: -1
+    help: |
+      Gaussian Random Timer
+      This timer pauses each thread request for a random amount of time, with most of the time intervals occurring
+      near a particular value. The total delay is the sum of the Gaussian distributed value (with mean 0.0 and
+      standard deviation 1.0) times the deviation value you specify, and the offset value. Another way to explain
+      it, in Gaussian Random Timer, the variation around constant offset has a gaussian curve distribution.
+
   wizard.configuration.duration:
     description: Desired duration of the test run, in seconds
 

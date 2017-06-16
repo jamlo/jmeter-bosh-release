@@ -17,12 +17,21 @@ module JMeterTornado
       ramp_time = settings['configuration']['ramp_time']
       continue_forever = settings['configuration']['continue_forever']
       duration = settings['configuration']['duration']
+      simple_delay = settings['configuration']['simple_delay']
+      gaussian_deviation = settings['configuration']['gaussian_deviation']
+      gaussian_constant_delay_offset = settings['configuration']['gaussian_constant_delay_offset']
 
       test do
         threads count: thread_count,
                 continue_forever: continue_forever,
                 rampup: ramp_time,
                 duration: duration do
+
+          if simple_delay != -1
+            think_time simple_delay
+          elsif gaussian_deviation != -1 && gaussian_constant_delay_offset != -1
+            think_time gaussian_constant_delay_offset, gaussian_deviation
+          end
 
           targets = settings['targets']
 

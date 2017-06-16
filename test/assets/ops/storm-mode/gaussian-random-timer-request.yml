@@ -1,0 +1,18 @@
+- type: replace
+  path: /instance_groups/name=test_node/jobs/-
+  value:
+    name: jmeter_storm
+    release: jmeter-tornado
+    properties:
+      wizard:
+        configuration:
+          users: 1
+          ramp_time: 1
+          duration: 5
+          gaussian_random_timer:
+            constant_delay_offset: 1000
+            deviation: 20
+        targets:
+        - name: Simple Get
+          url: "http://192.168.50.1:15672/greeting/get/smurf"
+          http_method: GET
