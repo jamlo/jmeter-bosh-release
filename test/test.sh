@@ -81,6 +81,28 @@ function assert_log_contains {
   fi
 }
 
+function assert_log_contains_exact_count {
+  number_of_occurances=$(grep -c "$1" "$TEST_WORKSPACE/sinatra.log")
+
+  if [[ $number_of_occurances == "$2" ]]; then
+    printf "${GREEN}I found '$2' occurances of '$1'\n${NC}"
+  else
+    printf "${RED}BROKEN: I found '$number_of_occurances' occurances of '$1', expected '$2'\n${NC}"
+    exit 1
+  fi
+}
+
+function assert_log_contains_less_than {
+  number_of_occurances=$(grep -c "$1" "$TEST_WORKSPACE/sinatra.log")
+
+  if [[ $number_of_occurances -lt "$2" ]]; then
+    printf "${GREEN}I found '$number_of_occurances' occurances of '$1'. Less than '$2'\n${NC}"
+  else
+    printf "${RED}BROKEN: I found '$number_of_occurances' occurances of '$1', expected less than '$2'\n${NC}"
+    exit 1
+  fi
+}
+
 function assert_errand_result_tarball_contains {
   tarball_contents=$(tar -ztvf $TEST_WORKSPACE/test_node-*.tgz)
 
@@ -204,6 +226,19 @@ deploy "$TEST_MODE/raw-tornado.yml"
 assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
 clean_after_test "$TEST_MODE" "raw-tornado"
 
+# =================================================
+# Simple Delayed Request
+deploy "$TEST_MODE/simple-delayed-request.yml"
+assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
+assert_log_contains_less_than '\"GET /greeting/get/smurf HTTP/1.1\" 200' 6
+clean_after_test "$TEST_MODE" "simple-delayed-request"
+
+# =================================================
+# Gaussian Random Timer
+deploy "$TEST_MODE/gaussian-random-timer-request.yml"
+assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
+assert_log_contains_less_than '\"GET /greeting/get/smurf HTTP/1.1\" 200' 6
+clean_after_test "$TEST_MODE" "gaussian-random-timer-request"
 
 # ==================================================================================================
 # ==================================================================================================
@@ -313,6 +348,22 @@ assert_errand_result_tarball_contains "jmeter_storm/jmeter.log" \
       "dashboard/content" \
       "jmeter_storm/log.jtl"
 clean_after_test "$TEST_MODE" "generate-dashboard"
+
+# =================================================
+# Simple Delayed Request
+deploy "$TEST_MODE/simple-delayed-request.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
+run_errand
+assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
+assert_log_contains_exact_count '\"GET /greeting/get/smurf HTTP/1.1\" 200' 2
+clean_after_test "$TEST_MODE" "simple-delayed-request"
+
+# =================================================
+# Gaussian Random Timer
+deploy "$TEST_MODE/gaussian-random-timer-request.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
+run_errand
+assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
+assert_log_contains_exact_count '\"GET /greeting/get/smurf HTTP/1.1\" 200' 8
+clean_after_test "$TEST_MODE" "gaussian-random-timer-request"
 
 printf "${GREEN}=========================================================\n"
 printf "${GREEN}Success: All Tests Passed !!!!!!!!!!!!!!!!!!!!\n"

@@ -16,6 +16,20 @@ end.else do
   raise "Should either specify a raw JMX test plan or use the wizard options to set the test plan."
 end
 
+simple_delay = p("wizard.configuration.simple_delay")
+gaussian_deviation = p("wizard.configuration.gaussian_random_timer.deviation")
+gaussian_constant_delay_offset = p("wizard.configuration.gaussian_random_timer.constant_delay_offset")
+
+if simple_delay != -1
+  if gaussian_deviation != -1 || gaussian_constant_delay_offset != -1
+    raise "Simulatanously specifying 'wizard.configuration.simple_delay' and 'wizard.configuration.gaussian_random_timer'. Can not decide which option to use."
+  end
+elsif (gaussian_deviation != -1 || gaussian_constant_delay_offset != -1)
+  if gaussian_deviation == -1 || gaussian_constant_delay_offset == -1
+    raise "When using 'gaussian_random_timer', both 'deviation' and 'constant_delay_offset' should be specified"
+  end
+end
+
 validation_result
 
 %>

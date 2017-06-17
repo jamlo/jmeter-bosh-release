@@ -45,6 +45,9 @@ if_p('wizard.targets') do |targets|
   params["configuration"]["ramp_time"] = p("wizard.configuration.ramp_time")
   params["configuration"]["continue_forever"] = true # hardcode to true, Tornado mode should loop forever
   params["configuration"]["duration"] = 60 * 60 * 24 * 365 # hardcode to 1 year, Tornado mode should not stop
+  params["configuration"]["simple_delay"] = p("wizard.configuration.simple_delay") # in milliseconds
+  params["configuration"]["gaussian_deviation"] = p("wizard.configuration.gaussian_random_timer.deviation") # in milliseconds
+  params["configuration"]["gaussian_constant_delay_offset"] = p("wizard.configuration.gaussian_random_timer.constant_delay_offset") # in milliseconds
 end
 
 JSON.dump(params)
