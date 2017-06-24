@@ -44,14 +44,17 @@ function restart_sinatra {
   printf "\nNew Server PID: $SINATRA_PID\n\n\n\n\n${NC}"
 }
 
-function clean_after_test {
-  gobosh delete-deployment --force -n -d jmeter-dep
-
+function clean_up_logs_and_restart_sinatra {
   mkdir -p "$LOG_DIR/archive/$1-$2"
   cp -r "$TEST_WORKSPACE/" "$LOG_DIR/archive/$1-$2/"
   rm -rf $TEST_WORKSPACE
   mkdir -p $TEST_WORKSPACE
   restart_sinatra
+}
+
+function clean_after_test {
+  gobosh delete-deployment --force -n -d jmeter-dep
+  clean_up_logs_and_restart_sinatra $1 $2
 }
 
 function deploy {
@@ -119,6 +122,10 @@ function assert_errand_result_tarball_contains {
 
 function run_errand {
   gobosh run-errand test_node -d jmeter-dep
+}
+
+function run_errand_keep_alive_download_logs {
+  gobosh run-errand test_node -d jmeter-dep --keep-alive --download-logs --logs-dir=$TEST_WORKSPACE
 }
 
 function run_errand_download_logs {
@@ -364,6 +371,24 @@ run_errand
 assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
 assert_log_contains_exact_count '\"GET /greeting/get/smurf HTTP/1.1\" 200' 8
 clean_after_test "$TEST_MODE" "gaussian-random-timer-request"
+
+# =================================================
+# Running errand with keep alive works
+deploy "$TEST_MODE/simple-get.yml" "$TEST_MODE/1-add-generic-workers.yml" "$TEST_MODE/2-add-errand-lifecycle.yml"
+run_errand_keep_alive_download_logs
+assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
+assert_errand_result_tarball_contains "jmeter_storm/jmeter.log" \
+      "jmeter_storm/jmeter_storm.stderr.log" \
+      "dashboard/content" \
+      "jmeter_storm/log.jtl"
+clean_up_logs_and_restart_sinatra "$TEST_MODE" "run-errand-twice-1"
+run_errand_keep_alive_download_logs
+assert_log_contains '\"GET /greeting/get/smurf HTTP/1.1\" 200'
+assert_errand_result_tarball_contains "jmeter_storm/jmeter.log" \
+      "jmeter_storm/jmeter_storm.stderr.log" \
+      "dashboard/content" \
+      "jmeter_storm/log.jtl"
+clean_after_test "$TEST_MODE" "run-errand-twice-2"
 
 printf "${GREEN}=========================================================\n"
 printf "${GREEN}Success: All Tests Passed !!!!!!!!!!!!!!!!!!!!\n"

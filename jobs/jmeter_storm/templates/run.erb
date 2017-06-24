@@ -7,8 +7,11 @@ export PATH=/var/vcap/packages/ruby-jmeter/bin:$PATH
 JOB_NAME=jmeter_storm
 RUN_DIR=/var/vcap/sys/run/${JOB_NAME}
 LOG_DIR=/var/vcap/sys/log/${JOB_NAME}
-PIDFILE=${RUN_DIR}/pid
 JMX_PLAN_FILE=${RUN_DIR}/plan.jmx
+
+<%# In case keep-alive flag was used, clean up before running %>
+rm -rf $RUN_DIR
+rm -rf $LOG_DIR
 
 <%# Collect IP Addresses of all the JMeter Servers %>
 <% jmeter_server_ips = link('jmeter_server').instances.map { |instance| instance.address } %>
