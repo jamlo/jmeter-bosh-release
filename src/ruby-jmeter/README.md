@@ -3,6 +3,7 @@ This folder contains ruby-jmeter gem (version 3.0.13) and all of its gem depende
 To get the list of gem in this folder:
 
 1- Create a file called `Gemfile`.
+
 2- In that file add these lines:
   ```
   source "http://rubygems.org"
