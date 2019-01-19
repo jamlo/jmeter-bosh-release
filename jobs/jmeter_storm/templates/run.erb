@@ -50,6 +50,15 @@ cp $JMX_PLAN_FILE $LOG_DIR/generated_test_plan.jmx
 
 pushd /var/vcap/packages/jmeter/bin
 
+<%
+  user_properties = []
+  if_p('jmeter.reportgenerator.overall_granularity') do
+    user_properties.push("jmeter.reportgenerator.overall_granularity=" << p("jmeter.reportgenerator.overall_granularity").to_s)
+  end
+%>
+
+echo '<%=user_properties.join("\n")%>' > user.properties
+
 java $JVM_ARGS -jar "ApacheJMeter.jar" \
     --nongui \
     --testfile $JMX_PLAN_FILE \

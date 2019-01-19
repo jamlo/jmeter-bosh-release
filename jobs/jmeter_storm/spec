@@ -109,6 +109,13 @@ properties:
   generate_dashboard:
     description: Apply "--reportatendofloadtests" when running jmeter
     default: true
+  
+  jmeter.reportgenerator.overall_granularity:
+    description: Granularity of over time graphs.
+    help: |
+      Taken From JMeter Documention
+        "Granularity of over time graphs. Data is aggregated to have 1 minute ticks.
+        Granularity must be higher than 1 second (1000) otherwise throughput graphs will be incorrect"
 
   # ==================================================================================================
   # ==================================================================================================
