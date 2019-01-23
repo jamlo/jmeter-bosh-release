@@ -23,6 +23,7 @@ JMETER_LOG_FILE=$LOG_DIR/jmeter.log
 STDOUT_LOG_FILE=$LOG_DIR/${JOB_NAME}.stdout.log
 STDERR_LOG_FILE=$LOG_DIR/${JOB_NAME}.stderr.log
 GENERATE_DASHBOARD=<% if p('generate_dashboard') %>"--reportatendofloadtests --reportoutputfolder $LOG_DIR/dashboard"<%end%>
+RMI_HOST_DEF=-Djava.rmi.server.hostname=<%=spec.networks.to_h.values.first.ip%>
 
 # JAVA options
 SERVER="-server" # optimize JAVA performance
@@ -60,6 +61,7 @@ pushd /var/vcap/packages/jmeter/bin
 echo '<%=user_properties.join("\n")%>' > user.properties
 
 java $JVM_ARGS -jar "ApacheJMeter.jar" \
+    ${RMI_HOST_DEF} \
     --nongui \
     --testfile $JMX_PLAN_FILE \
     --remotestart $SERVERS_IP_ADDRESSES \
