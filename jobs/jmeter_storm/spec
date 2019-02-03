@@ -6,6 +6,7 @@ templates:
   settings.json.erb: config/settings.json
   validation.txt.erb: config/validation.txt
   raw_test_plan.jmx.erb: config/raw_test_plan.jmx
+  user.properties.erb: config/user.properties
 
 packages:
 - jmeter
@@ -110,13 +111,6 @@ properties:
     description: Apply "--reportatendofloadtests" when running jmeter
     default: true
   
-  jmeter.reportgenerator.overall_granularity:
-    description: Granularity of over time graphs.
-    help: |
-      Taken From JMeter Documention
-        "Granularity of over time graphs. Data is aggregated to have 1 minute ticks.
-        Granularity must be higher than 1 second (1000) otherwise throughput graphs will be incorrect"
-
   # ==================================================================================================
   # ==================================================================================================
   # JVM Options
@@ -191,3 +185,12 @@ properties:
       # in tenuring longer than the life of per-sample objects -- which is hopefully
       # shorter than the period between two scavenges):
       # TENURING="-XX:MaxTenuringThreshold=2"
+
+  # ==================================================================================================
+  # ==================================================================================================
+  # User Properties
+  user_properties:
+    description: Additional JMeter properties
+    default: []
+    help: |
+      Reporting configuration (https://jmeter.apache.org/usermanual/generating-dashboard.html#configuration)
