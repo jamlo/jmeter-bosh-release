@@ -1,3 +1,7 @@
+# NOTE: THIS REPO IS NOT BEING UPDATED ANYMORE. ACCESS TO THE S3 BUCKET TO BUILD THE REPO WILL BE TURNED OFF. YOU CAN GET THE ACTUAL BLOBS FROM https://bosh.io/releases/github.com/jamlo/jmeter-bosh-release?all=1 
+
+# I'LL KEEP THIS REPO FOR UP FOR HISTORICAL REFERENCE
+
 # Tornado for Apache JMeter&trade; - A BOSH Release for Apache JMeter&trade;
 
 **Tornado for Apache JMeter&trade;**, is a [BOSH](https://bosh.io/) release for [Apache JMeter&trade;](http://jmeter.apache.org/). It simplifies the usage of JMeter&trade; in distributed mode.
