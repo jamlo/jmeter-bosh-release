@@ -6,6 +6,7 @@ templates:
   settings.json.erb: config/settings.json
   validation.txt.erb: config/validation.txt
   raw_test_plan.jmx.erb: config/raw_test_plan.jmx
+  user.properties.erb: config/user.properties
 
 packages:
 - jmeter
@@ -109,7 +110,7 @@ properties:
   generate_dashboard:
     description: Apply "--reportatendofloadtests" when running jmeter
     default: true
-
+  
   # ==================================================================================================
   # ==================================================================================================
   # JVM Options
@@ -184,3 +185,12 @@ properties:
       # in tenuring longer than the life of per-sample objects -- which is hopefully
       # shorter than the period between two scavenges):
       # TENURING="-XX:MaxTenuringThreshold=2"
+
+  # ==================================================================================================
+  # ==================================================================================================
+  # User Properties
+  user_properties:
+    description: Additional JMeter properties
+    default: []
+    help: |
+      Reporting configuration (https://jmeter.apache.org/usermanual/generating-dashboard.html#configuration)

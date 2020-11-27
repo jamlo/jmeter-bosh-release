@@ -1,0 +1,12 @@
+<%=
+
+params = []
+if_p('user_properties') do |properties|
+  properties.each do |property|
+    params << property.fetch("name")+"="+property.fetch("value").to_s
+  end
+end
+
+params.join("\n")
+
+%>
